@@ -1,0 +1,15 @@
+article:
+  emptyTitle: Empty title
+  categories: Categories
+  tag: Tag
+  more: More
+toolbar:
+  post: Recent articles
+  tag: Tag
+  categories: Categories
+  search: Search
+returnTop: Back to top
+prev: prev
+next: next
+page: page
+archive: Archive

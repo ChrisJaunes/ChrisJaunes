@@ -1,0 +1,25 @@
+
+<div class="con-wrap fadeToTop archive">
+    <% if(!theme.layout.columnPosition) { %>
+    <section class="article-area" style="order: 1; margin-right: 0; margin-left: 40px;">
+    <% } else { %>
+    <section class="article-area">
+    <% } %>
+        <% var old, year %>
+        <% page.posts.sort('date', 'desc').each(function(post) { %>
+            <%
+                year = date(post.date,'YYYY');
+                if(old != year){
+                    old = year;
+            %>
+                <div class="archive-year"><span class="year-block"><%= year %></span></div>
+
+            <%
+                }
+            %>
+            <%- partial('_partial/article.ejs', {item: post}) %>
+        <% }); %>
+        <%- partial('_partial/pagination') %>
+    </section>
+    <%- partial('_partial/toolbar') %>
+</div>

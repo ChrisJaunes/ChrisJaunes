@@ -1,0 +1,15 @@
+article:
+  emptyTitle: 空標題
+  categories: 分類
+  tag: 標簽
+  more: 閱讀更多
+toolbar:
+  post: 近期文章
+  tag: 標簽
+  categories: 分類
+  search: 搜索
+returnTop: 返回頂部
+prev: 上壹頁
+next: 下壹頁
+page: 頁面
+archive: 歸檔

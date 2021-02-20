@@ -1,0 +1,15 @@
+article:
+  emptyTitle: Titel leeren
+  categories: Einstufung
+  tag: Etikette
+  more: Mehr
+toolbar:
+  post: Aktuelle Artikel
+  tag: Etikette
+  categories: Einstufung
+  search: suchen nach
+returnTop: Zurück nach oben
+prev: Vorherige Seite
+next: Nächste Seite
+page: Seite
+archive: Archiv
