@@ -14,3 +14,7 @@ Here are some ideas to get you started:
 - 😄 Pronouns: ...
 - ⚡ Fun fact: ...
 -->
+
+😄 Hey! Welcome to my profile
+
+<img align="right" src="https://github-readme-stats.vercel.app/api?username=ChrisJaunes&count_private=true&theme=flag-india&show_icons=true&hide=prs,issues">
