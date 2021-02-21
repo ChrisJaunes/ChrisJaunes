@@ -1,0 +1,14 @@
+<div class="con-wrap fadeToTop">
+    <%_ if(theme.layout) { _%> 
+        <%_ if(!theme.layout.columnPosition) { _%>
+    <section class="article-area" style="order: 1; margin-right: 0; margin-left: 40px;">
+        <%_ } else { _%>
+    <section class="article-area">
+        <%_ } _%>
+        <%- include('_partial/article', {item: page}) _%>
+    </section>
+        <%- include('_partial/toolbar') %>
+    <%_ }else{_%>
+    <% console.warn("[post] no theme.layout");%>
+    <%_ } _%>
+</div>

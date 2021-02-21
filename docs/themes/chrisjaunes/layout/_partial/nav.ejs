@@ -1,0 +1,59 @@
+<nav class="nav cl">
+    <%_ if(theme.menu) { -%>
+    <ul class="cl nav-list">
+        <%_ for (var i in theme.menu){ _%>
+        <li>
+            <%_ if(theme.menu[i].child){ _%>
+                <%_ if(theme.menu[i].url == 'none'){ _%>
+            <a href="javascript:void(0)" class="<%- is_current(url_for(theme.menu[i].url)) ? 'active' : '' %>">
+                <%_ } else { _%>
+            <a href="<%- url_for(theme.menu[i].url) %>" class="<%- is_current(url_for(theme.menu[i].url)) ? 'active' : '' %>">
+                <%_ } _%>
+                <i class="<%= theme.menu[i].iconType %> fa-<%= theme.menu[i].icon %>"></i> 
+                <span><%= i %></span>
+                <span class="drop-flag fa fa-angle-down"></span>
+            </a>
+            <dl>
+                <%_ for (var f in theme.menu[i].child){ _%>
+                <li>
+                    <a href="<%- url_for(theme.menu[i].child[f].url) %>" class="">
+                    <i class="<%= theme.menu[i].child[f].iconType %> fa-<%= theme.menu[i].child[f].icon %>"></i>
+                    <span><%= f %></span>
+                    </a>
+                </li>
+                <%_ } _%>
+            </dl>
+            <%_ } else { _%>
+            <a href="<%- url_for(theme.menu[i].url) %>" class="<%- is_current(url_for(theme.menu[i].url)) ? 'active' : '' %>">
+                <i class="<%= theme.menu[i].iconType %> fa-<%= theme.menu[i].icon %>"></i> 
+                <span><%= i %></span>
+            </a>
+            <%_ } _%>
+        </li>
+        <%_ } _%>
+    </ul>
+    <%_ } else { _%>
+    <%_ console.warn("[nav] no menu"); _%>
+    <%_ } _%>
+    <%_ if(theme.account) { _%>
+    <ul class="cl nav-tool">
+        <%_ for (var i in theme.account){ _%>
+        <li>
+            <a href="<%- url_for(theme.account[i].url) %>">
+                <i class="<%= theme.account[i].iconType %> fa-<%= theme.account[i].icon %>"></i>
+            </a>
+        </li>
+        <%_ } _%>
+        <%_ if (theme.layout.headSearchIcon) { _%>
+        <li>
+            <a href="javascript:void(0)" class="nav-search-btn">
+                <i class="fa fa-search"></i>
+            </a>
+        </li>
+        <%_ } _%>
+    </ul>
+    <%_ } else { _%>
+    <% console.warn("[nav] no menu"); %>
+    <%_ } _%>
+    <%- search_form({'class':'nav-search','text': __('search...')}) %>
+</nav>

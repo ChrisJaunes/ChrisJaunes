@@ -1,0 +1,9 @@
+<header class="top" <%- theme.ifsparticle ? "id=fallEle" : "" %> style="background-image: url(<%- url_for(theme.banner) %>)" >
+    <i class="fa fa-bars" id="media-toggle" style="display: none"></i>
+    <div class="top-info cl fadeToBottom">
+        <h2 class="site-name">
+            <%= config.author ? config.author : (theme.name ? theme.name : "" ) %>
+            <small id="type-data"><%= config.description ? config.description : ""%></small>
+        </h2>
+    </div>
+</header>

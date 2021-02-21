@@ -1,0 +1,79 @@
+
+.toolbar
+    overflow auto
+    color $textColorDes
+    font-size 14px
+    display flex
+    flex-direction column
+    .widget
+        margin-bottom 40px
+        padding 30px
+        background-color $articleAreaBlockColor
+        border-radius 3px
+    .widget-title
+        font-size 18px
+        margin-bottom 30px
+        color $themeColor
+        font-weight bold
+    .widget-post
+        ul
+            padding-left 16px
+            li
+                list-style-type decimal
+                a
+                    display block
+                    padding 5px 0px
+                    color $textColorDes
+                    border-bottom 1px solid $borderColor
+                    &:hover
+                        color $themeColor
+                        font-weight bold
+    .widget-tags
+    .widget-categories
+        a
+            color $textColorDes
+            transition(color)
+            &:hover
+                color $themeColor
+    .widget-tags
+        border(bottom, 1px solid #0a0a0a)
+    .widget-categories
+        border(bottom, 1px solid #0a0a0a)
+        .category-list
+            li
+                margin 5px 0px
+            > li
+                border-bottom 1px solid $borderColor
+                padding-bottom 5px
+            .category-list-child
+                padding-top 5px
+                margin-top 5px
+                border-top 1px solid $borderColor
+                li::before
+                    content: "---- "
+        .category-list-count
+            &::before
+                content "（"
+            &::after
+                content "）"
+    input::-webkit-search-cancel-button
+        display none
+    input[type=search]::-ms-clear
+        display none
+    .widget-search
+        input[type="search"]
+            width 100%
+            height 30px
+            color $textColorDes
+            padding 20px 20px
+            background none
+            outline none
+            border:none;
+            -webkit-appearance none
+            border 1px solid $borderColor
+            @extend .transition
+            &:hover
+                border-color $themeColor
+    ::-moz-placeholder
+        color: $textColor
+

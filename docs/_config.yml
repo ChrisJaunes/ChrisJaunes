@@ -5,9 +5,9 @@
 # Site
 title: Hexo
 subtitle: ''
-description: ''
-keywords:
-author: John Doe
+description: '欢迎来的ChrisJaunes的世界'
+keywords: 'chrisjaunes'
+author: ChrisJaunes
 language: en
 timezone: ''
 
@@ -99,7 +99,7 @@ ignore:
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 # theme: landscape
-theme: mokusei
+theme: chrisjaunes
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment

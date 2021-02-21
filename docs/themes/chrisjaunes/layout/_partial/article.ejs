@@ -1,0 +1,68 @@
+
+<article class="article">
+    <div class="article-wrap">
+        <h2 class="article-title cl">
+            <a href="<%- url_for(item.path) %>" title="<%- item.title ? item.title : __('article.emptyTitle') %>">
+                <%- item.title ? item.title : __('article.emptyTitle') %>
+            </a>
+        </h2>
+        <%_ if(theme.article && (theme.article.dateSwitch || theme.article.categoriesSwitch)) {_%>
+        <ul class="article-extra" style="margin-bottom: 20px">
+            <%_ if (theme.article.dateSwitch) { _%>
+            <li class="article-time">
+                <%_ if(config.date_format) { _%>
+                <%= item.date.format(config.date_format) %>
+                <%_ }else if(theme.date_format) {_%>
+                <%= item.date.format(theme.date_format) %>
+                <%_ }else {_%>
+                <%= item.date.format("YYYY-MM-DD") %>
+                <%_ console.warn("[article] no date_format"); _%>
+                <%_ }_%>
+            </li> 
+            <%_ } _%>
+            <%_ if (theme.article.categoriesSwitch) { _%>
+                <%_ if (item.categories.data.length > 0) { _%>
+            <li class="article-category">
+                <ol class="category-list cl">
+                    <i class="fa fa-folder-o"></i>
+                    <%_ for (var i=0; i< item.categories.data.length; i++) { _%>
+                        <%_ if(!item.categories.data[i].parent) { _%>
+                        <li><a href="/categories/<%= item.categories.data[i].name %>/"><%= item.categories.data[i].name %></a></li>
+                        <%_ } _%>
+                    <%_ } _%>
+                </ol>
+            </li>
+                <%_ } _%>
+            <%_ } _%>
+        <%_ } else { _%>
+            <% console.warn("[article] no set theme.article");%>
+        <%_ } _%>
+        </ul>
+        <div class="article-description">
+            <%- is_post() ? item.content : (item.excerpt ? item.excerpt : truncate(strip_html(item.content), {length: 150, separator: ' '})); %>
+        </div>
+        <%_ if (theme.article && theme.article.tagSwitch) { _%>
+        <div class="article-tags">
+            <ul class="tags-list cl">
+                <%_ for(var i=0; i< item.tags.data.length; i++) { _%>
+                <li><a href="<%- url_for("/tags/" + item.tags.data[i].name + "/") %>"><i class="fa fa-tag"></i><%= item.tags.data[i].name %></a></li>
+                <%_ } _%>
+            </ul>
+        </div>
+        <%_ } _%>
+        <%_ if(is_post()) { _%>
+        <div class="article-pagination cl">
+            <%_ if(item.prev){ _%>
+            <div class="pagination-prev">
+                <a href="<%- url_for(item.prev.path) %>">上一篇：<%- item.prev.title ? item.prev.title : __('article.emptyTitle') %></a>
+            </div>
+            <%_ } _%>
+            <%_ if(item.next){ _%>
+            <div class="pagination-next">
+                <a href="<%- url_for(item.next.path) %>">下一篇：<%- item.next.title ? item.next.title : __('article.emptyTitle') %></a>
+            </div>
+            <%_ } _%>
+        </div>
+        <%_ } _%>
+    </div>
+</article>
