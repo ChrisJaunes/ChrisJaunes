@@ -1,5 +1,5 @@
 ---
-title: 构建TensorFlow环境
+title: 构建TensorFlow环境(提供远程服务)
 date: 2021-02-22 02:43:37
 tags: 
 - TensorFlow
@@ -133,7 +133,17 @@ https://colab.research.google.com/github/tensorflow/docs-l10n/blob/master/site/z
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     import tensorflow as tf
     ```
- 
+
+3. 安装jupyter_http_over_ws
+
+    ```bash
+    pip install --upgrade jupyter_http_over_ws>=0.0.7 && jupyter serverextension enable --py jupyter_http_over_ws
+    ```
+
+4. 修改配置文件
+    允许所有ip访问
+    参考：[https://zhuanlan.zhihu.com/p/64524822](https://zhuanlan.zhihu.com/p/64524822)
+
 ## 方案三 利用pip构建环境
 1.  系统要求
 
