@@ -1,5 +1,5 @@
 # 站点设置
-name: mokusei  
+name: chrisjuanes  
 description: This is a hexo theme 
 favicon: 
 banner: /imgs/head.jpg
@@ -21,7 +21,7 @@ menu:
 
 # 社交图标
 account:
-  github:
+  github: 
     url: /github
     icon: github
     iconType: fa

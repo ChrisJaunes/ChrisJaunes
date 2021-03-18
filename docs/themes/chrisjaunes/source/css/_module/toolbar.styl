@@ -50,12 +50,18 @@
                 margin-top 5px
                 border-top 1px solid $borderColor
                 li::before
-                    content: "---- "
+                    content: ">"
         .category-list-count
             &::before
                 content "（"
             &::after
                 content "）"
+        ul, ol, dl
+            list-style none
+            ul, ol, dl
+                margin-left 20px
+                li:before
+                    content '> '
     input::-webkit-search-cancel-button
         display none
     input[type=search]::-ms-clear
