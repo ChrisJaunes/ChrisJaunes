@@ -1,10 +1,13 @@
 ---
 title: 构建TensorFlow环境(提供远程服务)
 date: 2021-02-22 02:43:37
+categories:
+- [TensorFlow, env]
 tags: 
 - TensorFlow
 - Blockly
-excerpt: 这是关于TensorFlow环境搭建的文章, 介绍了在线体验TensorFlow、利用Docker搭建TensorFlow、利用pip安装TensorFlow。
+excerpt: 
+    这是关于TensorFlow环境搭建的文章, 介绍了在线体验TensorFlow、利用Docker搭建TensorFlow、利用pip安装TensorFlow。
 ---
 ## 方案一： 在线体验TensorFlow
 
@@ -30,12 +33,16 @@ https://colab.research.google.com/github/tensorflow/docs-l10n/blob/master/site/z
         ```
         如果不是root用户建议执行
         ```bash
+        sudo usermod -aG docker your_user_name
+        # 比如你的用户名是chrisjaunes
         sudo usermod -aG docker chrisjaunes
         ```
 
     2. 在Windows下安装Docker
 
         参考链接: [https://www.runoob.com/docker/windows-docker-install.html](https://www.runoob.com/docker/windows-docker-install.html)
+
+        直接下载即可
 
 
 2. 检查Docker是否安装完成
@@ -51,14 +58,14 @@ https://colab.research.google.com/github/tensorflow/docs-l10n/blob/master/site/z
     2. 检查Docker是否运行(Linux)
 
         ```bash
-        systemctl status docker.service
-         ```
+        $ systemctl status docker.service
+        ```
 
         Active为active (running)时表示Docker正在运行
 
     3. 运行Docker, 可能需要root权限, 可以使用sudo
         ```bash
-        systemctl start docker.service
+        $ systemctl start docker.service
         ```
 
 
