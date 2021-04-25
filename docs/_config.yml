@@ -101,6 +101,16 @@ ignore:
 # theme: landscape
 theme: chrisjaunes
 
+toc:
+  maxdepth: 3
+  class: toc
+  slugify: transliteration
+  decodeEntities: false
+  anchor:
+    position: after
+    symbol: ' '
+    style: header-anchor
+    
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
