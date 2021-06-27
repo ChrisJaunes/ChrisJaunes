@@ -19,17 +19,7 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
 
     本处采用的docker镜像是 tensorflow/tensorflow:latest
 
-2. 安装jupyter和jupyterlab
-
-    python 版本为 Python 3.6.9
-    
-    pip 版本为 pip 21.1.2
-
-    ```
-    pip install jupyter jupyterlab
-    ```
-
-3. 安装nodejs
+2. 安装nodejs
 
     因为使用了typescript，所以要安装nodejs， 参考:[ubuntu快速安装最新版nodejs，只需2步](https://blog.csdn.net/Ezreal_King/article/details/78659810)
 
@@ -46,9 +36,15 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
     npm config set registry http://registry.npm.taobao.org
     ```
 
-4. 安装typescript 
+3. 安装typescript 
     ```
     npm install typescript -g
+    ```
+
+4. 安装git
+    tensorflow/tensorflow:latest默认没有git 需要安装
+    ```
+    apt-get install git
     ```
 
 5. 下载BlocklyJupyter
@@ -56,9 +52,37 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
     ```
     git clone git@github.com:ChrisJaunes/blockly_teaching.git
     ```
+    当然有可能出现以下报错:
+    ```
+    Warning: Permanently added 'github.com,52.74.223.119' (RSA) to the list of known hosts.
+    git@github.com: Permission denied (publickey).
+    fatal: Could not read from remote repository.
+
+    Please make sure you have the correct access rights
+    and the repository exists.
+    ```
+    这是公钥出现问题了，你可以添加公钥到你的账户下面，也可以用https链接。
+    
+    采用https链接：
+    ```
+    git clone https://github.com/ChrisJaunes/blockly_teaching.git
+    ```
 
 6. 进入BlocklyJupyter
-7. npm安装
+    ```
+    cd blockly_teaching/BlocklyJupyter
+    ```
+
+7. 安装jupyter、jupyterlab等库
+   目录下有一个requirements.txt的文件，这个文件定义了所需要的jupyter等lib及其版本
+   ```
+    pip install -r requirements.txt --default-timeout=100 -i http://pypi.douban.com/simple/ --trusted-host pypi.douban.com
+   ```
+   由于使用root账户，有些包无法自动安装，可以手动安装。
+   
+   不过通常按照jupyter和jupyterlab就可以了，其余根据需要安装。
+
+8.  npm安装
     ```
     npm init
     npm install --save-dev
@@ -107,7 +131,7 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
     $ npm run build(成功)
     ```
 
-8. 运行
+9.  运行
     ```
     python main.py --allow-root --ip=0.0.0.0
     ```
