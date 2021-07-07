@@ -19,33 +19,26 @@ https://colab.research.google.com/github/tensorflow/docs-l10n/blob/master/site/z
 
 ## 方案二(推荐) 利用docker构建环境
 
-### 第一步 安装Docker，参考网站
+### 第一步 安装Docker
 
-1. 利用以下方式安装Docker
+#### Linux 下安装Docker
 
-    1. 在Ubuntu下安装Docker
+1. 利用以下方式安装Docker(Linux)
 
-        参考链接: [https://www.runoob.com/docker/ubuntu-docker-install.html](https://www.runoob.com/docker/ubuntu-docker-install.html) 
+    参考链接: [https://www.runoob.com/docker/ubuntu-docker-install.html](https://www.runoob.com/docker/ubuntu-docker-install.html) 
 
-        利用命令安装Docker
-        ```bash
-        curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
-        ```
-        如果不是root用户建议执行
-        ```bash
-        sudo usermod -aG docker your_user_name
-        # 比如你的用户名是chrisjaunes
-        sudo usermod -aG docker chrisjaunes
-        ```
+    利用命令安装Docker
+    ```bash
+    curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
+    ```
+    如果不是root用户建议执行
+    ```bash
+    sudo usermod -aG docker your_user_name
+    # 比如你的用户名是chrisjaunes
+    sudo usermod -aG docker chrisjaunes
+    ```
 
-    2. 在Windows下安装Docker
-
-        参考链接: [https://www.runoob.com/docker/windows-docker-install.html](https://www.runoob.com/docker/windows-docker-install.html)
-
-        直接下载即可
-
-
-2. 检查Docker是否安装完成
+2. 检查Docker是否安装完成(Linux)
     
     1. 利用 docker -v 检查docker是否安装完成
     
@@ -68,6 +61,11 @@ https://colab.research.google.com/github/tensorflow/docs-l10n/blob/master/site/z
         $ systemctl start docker.service
         ```
 
+#### Windows 下 安装Docker
+
+参考链接: [https://www.runoob.com/docker/windows-docker-install.html](https://www.runoob.com/docker/windows-docker-install.html)
+
+直接下载即可
 
 ### 第二步 安装TensorFlow Docker镜像
 1. Tensorflow Docker相关
