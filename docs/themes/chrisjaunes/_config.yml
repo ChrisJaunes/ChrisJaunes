@@ -22,15 +22,15 @@ menu:
 # 社交图标
 account:
   github: 
-    url: /github
+    url: https://github.com/ChrisJaunes
     icon: github
     iconType: fa
   mail:
-    url: /mail
+    url: mailto:judgehuang@tencent.com
     icon: envelope
     iconType: fa
   twitter:
-    url: /twitter
+    url: None
     icon: twitter
     iconType: fa
 
@@ -63,10 +63,14 @@ article:
   categoriesSwitch: 1 #是否显示文章分类
   tagSwitch: 1 #是否显示文章标签
 
-# disqus评论
-comment:
-  disqus:
-    shortname: 
-
 # 粒子特效开关
 ifsparticle:  1
+
+gitalk:
+  enable: true
+  owner: ChrisJaunes
+  admin: ChrisJaunes
+  repo: ChrisJaunes
+  clientID: 0ba2ec4192b1d2fb9cb6
+  clientSecret: 85deadc0e6ed5bdf825a822ab2fdfbad69401fb9
+  distractionFreeMode: true
