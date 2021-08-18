@@ -9,11 +9,11 @@ tags:
 excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章。
 ---
 
-## 构建服务器环境
+## 构建Linux服务器环境
 
 1. 由于需要支持TensorFlow，利用google提供的Docker
 
-    参考: [构建tensorfrom环境](https://chrisjaunes.github.io/ChrisJaunes/2021/02/22/%E6%9E%84%E5%BB%BAtensorfrom%E7%8E%AF%E5%A2%83/)
+    参考: [构建tensorfrom环境](https://chrisjaunes.github.io/ChrisJaunes/2021/02/22/%E6%9E%84%E5%BB%BAtensorflow%E7%8E%AF%E5%A2%83/)
 
     按照方案二，安装Docker镜像，然后启动Docker，在Docker中继续操作
 
@@ -22,11 +22,14 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
 2. 安装nodejs
 
     因为使用了typescript，所以要安装nodejs， 参考:[ubuntu快速安装最新版nodejs，只需2步](https://blog.csdn.net/Ezreal_King/article/details/78659810)
+    
+    note: 是在 docker容器中安装，而不是在服务器系统上安装
 
     ```
     curl -sL https://deb.nodesource.com/setup_14.x | bash -
     apt-get install -y nodejs
     ```
+    
     nodejs 版本 v14.17.0
     npm 版本 6.14.13
 
@@ -34,9 +37,13 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
     
     ```
     npm config set registry http://registry.npm.taobao.org
+    npm config set registry https://mirrors.tencent.com/npm/
     ```
 
 3. 安装typescript 
+    
+    note: 是在 docker容器中安装，而不是在服务器系统上安装
+    
     ```
     npm install typescript -g
     ```
@@ -80,7 +87,7 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
    ```
    由于使用root账户，有些包无法自动安装，可以手动安装。
    
-   不过通常按照jupyter和jupyterlab就可以了，其余根据需要安装。
+   不过通常安装jupyter和jupyterlab就可以了，其余根据需要安装。
 
 8.  npm安装
     ```
@@ -132,6 +139,45 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
     ```
 
 9.  运行
+    ```
+    python main.py --allow-root --ip=0.0.0.0
+    ```
+# 构建windows测试环境
+
+1. 由于需要支持TensorFlow，利用google提供的Docker
+    
+    参考: [构建tensorfrom环境](https://chrisjaunes.github.io/ChrisJaunes/2021/02/22/%E6%9E%84%E5%BB%BAtensorflow%E7%8E%AF%E5%A2%83/)
+
+    本处采用的docker镜像是 tensorflow/tensorflow:latest
+
+2. 安装nodejs、typescript、git
+
+    同上文，在docker容器中安装而不是在windows上安装
+
+3. 下载BlocklyJupyter
+
+    同上文，但可以选择在docker容器中存储或者在windows上存储
+
+4. 映射文件到容器
+
+    如果BlocklyJuptyter在windows上存储,  可以映射文件到容器,假设windows上的路径F:/blockly_teaching，映射到docker容器中的位置为/root/blockly_teaching
+
+    容器创建命令(映射文件，映射端口，可交互)
+    ```
+    docker run -it -v F:/blockly_teaching:/root/blockly_teaching -p 8888:8888 tensorflow/tensorflow /bin/bash
+    ```
+
+    如果BlocklyJuptyter在docker容器中存储，但想在windows中编辑，使用VSCode的remote wsl插件
+
+5. 安装jupyter、jupyterlab等库
+
+    同上文，在docker容器中安装，而不是在windows中安装
+
+6. npm安装
+
+    同上文，在docker容器中安装，而不是在windows中安装
+
+7. 运行
     ```
     python main.py --allow-root --ip=0.0.0.0
     ```
