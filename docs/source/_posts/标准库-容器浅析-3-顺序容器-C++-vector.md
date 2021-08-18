@@ -6,7 +6,7 @@ categories:
 - [programing_language, 比较学习]
 tags:
 - C++
-excerpt: d
+excerpt: 分析了c++顺序容器vector的用法
 ---
 # C++顺序容器浅析
 

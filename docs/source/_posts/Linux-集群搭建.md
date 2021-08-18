@@ -3,7 +3,7 @@ title: Linux 集群搭建
 date: 2021-05-28 12:05:14
 categories: Linux
 tags: Linux
-excerpt: Linux
+excerpt: 介绍了如何搭建linux集群
 ---
 
 
