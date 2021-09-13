@@ -1,15 +1,16 @@
 ---
-title: 构建 Tensorflow+BlocklyJupyter 环境
+title: 构建 BlocklyJupyter 环境
 date: 2021-06-11 23:52:04
+categories:
+- [Blockly, BlocklyJupyter]
 tags: 
-- Tensorflow
 - Blockly
 - Jupyter
 
-excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章。
+excerpt: 这是关于 BlocklyJupyter 境搭建的文章。
 ---
 
-## 构建Linux服务器环境
+## 构建服务器环境(Linux)
 
 1. 由于需要支持TensorFlow，利用google提供的Docker
 
@@ -60,6 +61,7 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
     git clone git@github.com:ChrisJaunes/blockly_teaching.git
     ```
     当然有可能出现以下报错:
+    {% spoiler "git clone 报错" %}
     ```
     Warning: Permanently added 'github.com,52.74.223.119' (RSA) to the list of known hosts.
     git@github.com: Permission denied (publickey).
@@ -68,6 +70,7 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
     Please make sure you have the correct access rights
     and the repository exists.
     ```
+    {% endspoiler %}
     这是公钥出现问题了，你可以添加公钥到你的账户下面，也可以用https链接。
     
     采用https链接：
@@ -87,7 +90,7 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
    ```
    由于使用root账户，有些包无法自动安装，可以手动安装。
    
-   不过通常安装jupyter和jupyterlab就可以了，其余根据需要安装。
+   不过通常安装jupyter和jupyterlab就可以了，其余根据需要安装，如果需要多用户的，需要安装jupyterhub
 
 8.  npm安装
     ```
@@ -139,10 +142,17 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
     ```
 
 9.  运行
+    单用户启动
+    ```shell
+    python -m main --allow-root --ip=0.0.0.0
     ```
-    python main.py --allow-root --ip=0.0.0.0
+    多用户启动
+    ```shell
+    cd config
+    jupyterhub -f jupyterhub_config.py
     ```
-# 构建windows测试环境
+
+## 构建本机测试环境(windows)
 
 1. 由于需要支持TensorFlow，利用google提供的Docker
     
@@ -164,7 +174,7 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
 
     容器创建命令(映射文件，映射端口，可交互)
     ```
-    docker run -it -v F:/blockly_teaching:/root/blockly_teaching -p 8888:8888 tensorflow/tensorflow /bin/bash
+    docker run -it -v F:/blockly_teaching:/data/blockly_teaching -p 8888:8888 tensorflow/tensorflow /bin/bash
     ```
 
     如果BlocklyJuptyter在docker容器中存储，但想在windows中编辑，使用VSCode的remote wsl插件
@@ -178,6 +188,4 @@ excerpt: 这是关于 Tensorflow+BlocklyJupyter 服务器环境搭建的文章�
     同上文，在docker容器中安装，而不是在windows中安装
 
 7. 运行
-    ```
-    python main.py --allow-root --ip=0.0.0.0
-    ```
+    同上文,在docker容器中运行，而不是在windows中运行
