@@ -2,7 +2,7 @@
 title: python 内置函数 数学运算
 date: 2021-04-17 18:28:19
 categories:
-- [python, 内置函数]
+- [Python, 内置函数]
 - [programing_language, 比较学习]
 tags:
 - Python
