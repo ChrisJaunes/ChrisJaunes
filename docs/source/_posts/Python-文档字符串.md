@@ -40,7 +40,7 @@ Python 代码中其他地方出现的字符串可以当作文档，但它们不�
 ### 多行引号
 
 多行文档字符串由一个摘要行组成，后面跟着一个空行，后面跟着一个更详细的描述。
-自动索引工具可能会使用摘要行。摘要行可以与开始引号在同一行，也可以在下一行。摘要行适合一行，并通过一个空行与文档字符串的其余部分分开。整个文档字符串的缩进与其第一行的引号相同
+自动索引工具可能会使用摘要行。摘要行可以与开始引号在同一行，也可以在下一行。摘要行适合一行，并通过一个空行与文档字符串的其余部分分开。整个文档字符串的缩进与其第一行的引号相同。
 
 ### 脚本的文档字符串
 
@@ -48,7 +48,7 @@ Python 代码中其他地方出现的字符串可以当作文档，但它们不�
 The docstring of a script (a stand-alone program) should be usable as its "usage" message, printed when the script is invoked with incorrect or missing arguments (or perhaps with a "-h" option, for "help"). Such a docstring should document the script's function and command line syntax, environment variables, and files. Usage messages can be fairly elaborate (several screens full) and should be sufficient for a new user to use the command properly, as well as a complete quick reference to all options and arguments for the sophisticated user.
 {% endspoiler %}
 
-脚本(独立程序)的文档字符串应该可用作其“使用”消息，当使用不正确或缺失的参数调用脚本时显示该文本字符串(或者可能使用“-h”选项，表示“help”)。这样的文档字符串应该记录脚本的函数、命令行语法、环境变量和文件。使用消息可能相当详细(占满几个屏幕)，应该足以让新用户正确使用该命令，以及老用户快速参考所有选项和完整的参数。
+脚本(独立程序)的文档字符串应该可用作其“使用方法”消息，当使用不正确或缺失的参数调用脚本时显示该文本字符串(或者可能使用“-h”选项，表示“help”)。这样的文档字符串应该记录脚本的功能、命令行语法、环境变量和文件。使用消息可以是相当详细的(占满几个屏幕)，并且应该足以指导新用户正确使用命令，以及高级用户也可以完整快速的索引到全部选项和参数。
 
 ### 模块的文档字符串
 
@@ -56,7 +56,7 @@ The docstring of a script (a stand-alone program) should be usable as its "usage
 The docstring for a module should generally list the classes, exceptions and functions (and any other objects) that are exported by the module, with a one-line summary of each. (These summaries generally give less detail than the summary line in the object's docstring.) The docstring for a package (i.e., the docstring of the package's \_\_init\_\_.py module) should also list the modules and subpackages exported by the package.
 {% endspoiler %}
 
-模块的文档字符串通常应列出由该模块导出的类、异常和函数（以及任何其他对象），并在一行中列出每一项。（这些摘要通常比对象文档字符串中的摘要行提供的详细信息更少）。包的文档字符串（即包的__init__.py模块的文档字符串）还应列出包导出的模块和子包。
+模块的文档字符串通常应列出由该模块导出的类、异常和函数（以及任何其他对象），并在一行中列出每一项。（这些摘要通常比对象文档字符串中的摘要行提供的详细信息更少）。软件包的文档字符串（即包的__init__.py模块的文档字符串）还应列出软件包导出的模块和子包。
 
 ### 函数和方法的文档字符串
 {% spoiler "函数和方法的文档字符串" %}
@@ -72,5 +72,5 @@ The docstring for a class should summarize its behavior and list the public meth
 If a class subclasses another class and its behavior is mostly inherited from that class, its docstring should mention this and summarize the differences. Use the verb "override" to indicate that a subclass method replaces a superclass method and does not call the superclass method; use the verb "extend" to indicate that a subclass method calls the superclass method (in addition to its own behavior).
 {% endspoiler %}
 
-类的文档字符串应总结其行为并列出公共方法和实例变量。如果该类打算被子类化，并且具有用于子类的附加接口，则应单独列出该接口（在文档字符串中）。类构造函数应记录在其 \_\_init\_\_ 方法的文档字符串中。单个方法应该由方法自身的文档字符串记录。
-如果一个类是另一个类的子类，并且它的行为主要是从该类继承的，则其文档字符串应提及这一点并总结差异。使用动词“override”表示子类方法替换超类方法，不调用超类方法；使用动词“extend”来表示子类方法调用超类方法（除了它自己的行为）。
+类的文档字符串应该总结其行为并列出公共方法和实例变量。如果该类旨在被子类化，并且有一个子类的附加接口，则该接口应该单独列出(在文档字符串中)。类构造函数应该在文档字符串中记录其\_\_init\_\_方法。私有方法应该由他们自己的文档字符串记录。
+如果一个类对另一个类进行子类化，并且其行为主要从该类继承，则其文档字符串应该提及这一点并总结出差异。 使用动词“override”表示子类方法替换超类方法，不调用超类方法; 使用动词“extend”来表示一个子类方法调用超类方法(除了自己的行为)
