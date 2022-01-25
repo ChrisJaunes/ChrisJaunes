@@ -9,20 +9,22 @@ tags:
 excerpt: 介绍了Presto中的SqlParser模块下的SqlParser类
 ---
 
-# SqlParser 浅析
+# SqlParser类 浅析
 
-从编译的角度来看, 编译需要以下步骤
-<img src="https://blog.ginshio.org/blog/CompilerPrinciple/compiler-steps.svg" alt="编译" style="background: white;">
+解析DSL需要以下步骤
 
-解析SQL和上述略有不同， 产生语法树以后接着生成逻辑执行计划和物理执行计划，但之前的词法分析和语法分析步骤是一致的
+{% asset_img parser-steps.svg [parser-steps] %}
 
-而前面这几部分的由SqlParser管理，其中主要需要了解的方法是 invokeParser
+presto 解析 SQL 所用的工具 为 Antlr， 利用Antlr产生的Lexer和Parser进行SQL解析则是由 SqlParser 管理，主要是在 invokeParser 中 进行
 
 ---
 
 首先 将要解析的 sql 从 String 转成 CharStreams
 
 考虑到 SQL 大小写不敏感，因此将字符流转成不区分大小写的字符流。 CaseInsensitiveStream 采用了代理模式，并在 LA方法中添加了 将所有的字符变成了大写 的逻辑。
+
+这样就得到了词法分析器需要的字符流
+
 {% spoiler "CaseInsensitiveStream 源码" %}
 ```java
 public class CaseInsensitiveStream implements CharStream {
@@ -68,21 +70,25 @@ public class CaseInsensitiveStream implements CharStream {
 ```
 {% endspoiler %}
 
+---
+
 接着 将字符流送入词法分析器
 
-SqlBaseLexer是Antlr根据[sqlbase.g4](https://github.com/prestodb/presto/blob/master/presto-parser/src/main/antlr4/com/facebook/presto/sql/parser/SqlBase.g4)生成的词法解析器，继承[Lexer](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/Lexer.java)，间接继承了[Recognizer<Integer, LexerATNSimulator>](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/Recognizer.java) 实现了[TokenSource](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/TokenSource.java)
+SqlBaseLexer 是Antlr根据[sqlbase.g4](https://github.com/prestodb/presto/blob/master/presto-parser/src/main/antlr4/com/facebook/presto/sql/parser/SqlBase.g4)生成的词法分析器，继承[Lexer](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/Lexer.java)，间接继承了[Recognizer<Integer, LexerATNSimulator>](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/Recognizer.java)， 而 [Recognizer<Integer, LexerATNSimulator>](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/Recognizer.java) 实现了[TokenSource](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/TokenSource.java)
 
 ---
 
-经过词法分析器以后，产生符号流
+经过词法分析器以后，产生符号流。 由于 SqlBaseLexer 实现了 TokenSource， 因此可以转成 [CommonTokenStream](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/CommonToken.java)
+
+--- 
 
 接着 将符号流送入语法分析器
 
-SqlBaseParser是Antlr根据[sqlbase.g4](https://github.com/prestodb/presto/blob/master/presto-parser/src/main/antlr4/com/facebook/presto/sql/parser/SqlBase.g4)生成的语法解析器，继承[Parser](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/Parser.java)，间接继承了[Recognizer<Integer, LexerATNSimulator>](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/Recognizer.java)
+SqlBaseParser 是Antlr根据[sqlbase.g4](https://github.com/prestodb/presto/blob/master/presto-parser/src/main/antlr4/com/facebook/presto/sql/parser/SqlBase.g4)生成的语法分析器，继承[Parser](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/Parser.java)，间接继承了[Recognizer<Integer, LexerATNSimulator>](https://github.com/antlr/antlr4/blob/master/runtime/Java/src/org/antlr/v4/runtime/Recognizer.java)
 
 ---
 
-为了允许用户对于词法分析器和语法分析器做额外的定制，initializer接受词法分析器对象和语法分析器对象并对其操作，默认情况下是不进行任何操作
+为了允许用户对于词法分析器和语法分析器做自定义的处理，initializer接受词法分析器对象和语法分析器对象并对其操作，默认情况下是不进行任何操作
 
 {% spoiler "SqlParser initializer 相关源码" %}
 ```java
@@ -120,7 +126,7 @@ PostProcessor 重写了exitUnquotedIdentifier、exitBackQuotedIdentifier、exitD
 1. exitUnquotedIdentifier 方法处理不带引号的标识符，当标识符存在不合法符号的时候抛出异常
     - 不合法符号由EnumSet.complementOf(allowedIdentifierSymbols)确定
 
-    - allowedIdentifierSymbols 在 构造函数 中初始化，并且使用final仅禁止改变该变量的引用
+    - allowedIdentifierSymbols 在 构造函数 中初始化，并且使用final禁止改变该变量的引用
 
     - 例如 select * from foo@bar 存在不合法符号 @，由此抛出“line 1:15: identifiers must not contain '@'”
 
@@ -227,7 +233,15 @@ public class SqlParser {
 
 ---
 
-当然 还为词法分析器和语法分析器添加了ErrorHandler，也提供了选项让用户选择是否启用增强ErrorHandler
+当然 还为词法分析器和语法分析器添加了错误监听器，在添加错误监听之前移除了全部已有的错误监听器。
+
+LEXER_ERROR_LISTENER 是一个 BaseErrorListener，提供了一个转换功能, 用于将 Antlr 的 syntaxError 转成 Presto 中的 ParsingException 并抛出。
+
+PARSER_ERROR_HANDLER 是一个 ErrorHandler。ErrorHandler 从 BaseErrorListener 继承，并提供了[生成器](https://refactoringguru.cn/design-patterns/builder)来构造ErrorHandler对象，可以针对 specialRules、 specialTokens、 ignoredRules 做出处理。PARSER_ERROR_HANDLER 处理的规则见代码。
+
+用户可以根据enhancedErrorHandlerEnabled 为 parser 选择 添加 PARSER_ERROR_HANDLER 还是 LEXER_ERROR_LISTENER
+
+还为语法分析器设置了错误处理策略，为了防止弄乱报告，重写了recoverInline方法。
 
 {% spoiler "SqlParser ErrorHandler 相关源码" %}
 ```java
@@ -322,7 +336,7 @@ public class SqlParser{
 
 最后需要对于这颗语法树的所有元素进行某些处理，考虑到语法树是一个复杂的对象结构，Antlr允许使用[访问者模式](https://refactoringguru.cn/design-patterns/visitor)。
 
-使用AstBuilder对象对这颗语法树进行访问
+使用AstBuilder对象对这颗语法树进行访问和处理。
 
 ---
 
