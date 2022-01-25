@@ -1,7 +1,7 @@
 # 站点设置
 name: chrisjuanes  
 description: This is a hexo theme 
-favicon: 
+favicon: /imgs/avatar.jpg
 banner: /imgs/head.jpg
 rss: 
 
@@ -28,10 +28,6 @@ account:
   mail:
     url: mailto:judgehuang@tencent.com
     icon: envelope
-    iconType: fa
-  twitter:
-    url: None
-    icon: twitter
     iconType: fa
 
 # 以下配置中的1为开启，0为关闭
@@ -65,12 +61,3 @@ article:
 
 # 粒子特效开关
 ifsparticle:  1
-
-gitalk:
-  enable: true
-  owner: ChrisJaunes
-  admin: ChrisJaunes
-  repo: ChrisJaunes
-  clientID: 0ba2ec4192b1d2fb9cb6
-  clientSecret: 85deadc0e6ed5bdf825a822ab2fdfbad69401fb9
-  distractionFreeMode: true

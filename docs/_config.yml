@@ -3,7 +3,7 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: ChrisJaunes
 subtitle: ''
 description: '欢迎来的ChrisJaunes的世界'
 keywords: 'chrisjaunes'
@@ -13,7 +13,7 @@ timezone: ''
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://example.com/child' and root as '/child/'
-url: http://example.com
+url: https://chrisjaunes.github.io/
 root: /ChrisJaunes
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -120,3 +120,12 @@ deploy:
   type: git
   repo: git@github.com:ChrisJaunes/ChrisJaunes.git
   branch: gh-pages
+
+gitalk:
+  enable: true
+  owner: ChrisJaunes
+  admin: ChrisJaunes
+  repo: ChrisJaunes
+  clientID: 0ba2ec4192b1d2fb9cb6
+  clientSecret: 85deadc0e6ed5bdf825a822ab2fdfbad69401fb9
+  distractionFreeMode: true

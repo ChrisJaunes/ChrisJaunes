@@ -16,7 +16,7 @@
 		title.push(config.title);
 	%><title><%= title.join(' - ') %></title>
 	<% if( theme.rss) { %><link rel="alternate" href="<%- theme.rss %>" type="application/atom+xml"/><% } %>
-	<% if( theme.favicon) { %><link rel="shortcut icon" href="<%- theme.favicon %>"/><% } %>
+	<% if( theme.favicon) { %><link rel="shortcut icon" href="<%- url_for(theme.favicon) %>"/><% } %>
 	<%- css('css/style') %>
 	<%- css('https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css') %>
 </head>
