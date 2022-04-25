@@ -3,7 +3,7 @@ title: D3-Format-源码浅析
 date: 2022-04-02 11:55:23
 categories: [D3]
 tags: [D3]
-excerpt: 本文介绍了D3的使用
+excerpt: 本文浅析了D3-Format
 ---
 
 考虑到 JavaScript 有时候不会以我们期望的方式显示数字，我们需要一些格式化工具，比如 d3-format
