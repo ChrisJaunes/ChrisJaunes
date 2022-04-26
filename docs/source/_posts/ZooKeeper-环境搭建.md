@@ -3,8 +3,8 @@ title: ZooKeeper-环境搭建
 date: 2022-04-25 19:21:39
 categories: ["分布式", "ZooKeeper"]
 tags: 
-- 分布式
 - ZooKeeper
+- 分布式
 excerpt: 本文介绍了如何搭建ZK集群
 ---
 
