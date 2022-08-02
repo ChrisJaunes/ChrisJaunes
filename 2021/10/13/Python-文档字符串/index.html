@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="description" content="欢迎来的ChrisJaunes的世界">
+	<meta name="keywords" content="chrisjaunes">
+	<title>Python-文档字符串 - ChrisJaunes</title>
+	
+	<link rel="shortcut icon" href="/ChrisJaunes/imgs/avatar.jpg"/>
+	
+<link rel="stylesheet" href="/ChrisJaunes/css/style.css">
+
+	
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+<body>
+	<div class="main-con">
+<nav class="nav cl">
+    <ul class="cl nav-list">
+        <li>
+            <a href="/ChrisJaunes/" class="">
+                <i class="fa fa-home"></i> 
+                <span>主页</span>
+            </a>
+        </li>
+        <li>
+            <a href="/ChrisJaunes/archives/" class="">
+                <i class=" fa-"></i> 
+                <span>归档</span>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" class="">
+                <i class=" fa-"></i> 
+                <span>关于</span>
+                <span class="drop-flag fa fa-angle-down"></span>
+            </a>
+            <dl>
+                <li>
+                    <a href="/ChrisJaunes/about" class="">
+                    <i class=" fa-"></i>
+                    <span>关于本站</span>
+                    </a>
+                </li>
+            </dl>
+        </li>
+    </ul>
+    <ul class="cl nav-tool">
+        <li>
+            <a target="_blank" rel="noopener" href="https://github.com/ChrisJaunes">
+                <i class="fa fa-github"></i>
+            </a>
+        </li>
+        <li>
+            <a href="mailto:judgehuang@tencent.com">
+                <i class="fa fa-envelope"></i>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" class="nav-search-btn">
+                <i class="fa fa-search"></i>
+            </a>
+        </li>
+    </ul>
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="nav-search"><input type="search" name="q" class="nav-search-input" placeholder="search..."><input type="hidden" name="sitesearch" value="https://chrisjaunes.github.io"></form>
+</nav>
+
+        
+<div class="con-wrap fadeToTop">
+    <section class="article-area">
+        
+<article class="article">
+    <div class="article-wrap">
+        <h2 class="article-title cl">
+            <a href="/ChrisJaunes/2021/10/13/Python-%E6%96%87%E6%A1%A3%E5%AD%97%E7%AC%A6%E4%B8%B2/" title="Python-文档字符串">
+                Python-文档字符串
+            </a>
+        </h2>
+        <ul class="article-extra" style="margin-bottom: 20px">
+            <li class="article-time">
+                2021-10-13
+            </li> 
+            <li class="article-category">
+                <ol class="category-list cl">
+                    <i class="fa fa-folder-o"></i>
+                        <li><a href="/categories/Python/">Python</a></li>
+                        <li><a href="/categories/programing_language/">programing_language</a></li>
+                </ol>
+            </li>
+        </ul>
+        <div class="article-description">
+            <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1><span id="wen-dang-zi-fu-chuan">文档字符串</span><a href="#wen-dang-zi-fu-chuan" class="header-anchor"> </a></h1>
+<h2><span id="jian-jie">简介</span><a href="#jian-jie" class="header-anchor"> </a></h2>
+<p>Donald Knuth 在 “Literate Programming” 中提到</p>
+<blockquote>
+<p>Instead of imagining that our main task is to instruct a computer what to do, let us concentrate rather on explaining to human beings what we want a computer to do.</p>
+</blockquote>
+<p>如何更好去和别人沟通我们希望计算机去做什么？我们自然会想到使用注释，然而混杂在代码里面的注释并不好管理。python提供了文档字符串来帮助我们管理注释，但是光提供语法是不够的，我们需要一个规范来指导我们不同层级的文档字符串应该包含什么。</p>
+<p>PEP 257 记录了与Python文档字符串相关的语义和约定</p>
+<h2><span id="pep-257">PEP 257</span><a href="#pep-257" class="header-anchor"> </a></h2>
+<p><a target="_blank" rel="noopener" href="https://www.python.org/dev/peps/pep-0257">PEP257链接</a></p>
+<p>这个PEP的目的是标准化关于文档字符串的高级结构：它们应该包含什么以及如何表达(不涉及文档字符串中的任何标记语法)。PEP包含约定，而不是规定或者语法，因此你可以不遵守这些约定，但这样你的内容看起来可能不够整齐简洁，而一些类型docutils的文档字符串处理系统需要你遵守约定才能更好的工作。</p>
+<h3><span id="ding-yi">定义</span><a href="#ding-yi" class="header-anchor"> </a></h3>
+<p>文档字符串在脚本、模块、函数、类或者方法定义中作为第一条语句出现的字符串，这样的字符串成为该对象的 __doc__ 特殊属性。</p>
+<p>Python 代码中其他地方出现的字符串可以当作文档，但它们不能被Python解析器识别，也不能作为运行时的对象属性访问(没有分配给 __doc__)</p>
+<p>为了保持一致性，PEP257 建议 文档字符串使用三重引号。</p>
+<p>即使是一行也应该使用三重引号，虽然单引号和双引号也可以被正确识别，但不推荐这么做</p>
+<h3><span id="dan-xing-yin-hao">单行引号</span><a href="#dan-xing-yin-hao" class="header-anchor"> </a></h3>
+<p><a target="_blank" rel="noopener" href="https://www.python.org/dev/peps/pep-0257/#one-line-docstrings">链接</a></p>
+<h3><span id="duo-xing-yin-hao">多行引号</span><a href="#duo-xing-yin-hao" class="header-anchor"> </a></h3>
+<p>多行文档字符串由一个摘要行组成，后面跟着一个空行，后面跟着一个更详细的描述。<br>
+自动索引工具可能会使用摘要行。摘要行可以与开始引号在同一行，也可以在下一行。摘要行适合一行，并通过一个空行与文档字符串的其余部分分开。整个文档字符串的缩进与其第一行的引号相同。</p>
+<h3><span id="jiao-ben-de-wen-dang-zi-fu-chuan">脚本的文档字符串</span><a href="#jiao-ben-de-wen-dang-zi-fu-chuan" class="header-anchor"> </a></h3>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        脚本的文档字符串
+    </div>
+    <div class="spoiler-content">
+        <p>The docstring of a script (a stand-alone program) should be usable as its “usage” message, printed when the script is invoked with incorrect or missing arguments (or perhaps with a “-h” option, for “help”). Such a docstring should document the script’s function and command line syntax, environment variables, and files. Usage messages can be fairly elaborate (several screens full) and should be sufficient for a new user to use the command properly, as well as a complete quick reference to all options and arguments for the sophisticated user.</p>
+
+    </div>
+</div>
+<p>脚本(独立程序)的文档字符串应该可用作其“使用方法”消息，当使用不正确或缺失的参数调用脚本时显示该文本字符串(或者可能使用“-h”选项，表示“help”)。这样的文档字符串应该记录脚本的功能、命令行语法、环境变量和文件。使用消息可以是相当详细的(占满几个屏幕)，并且应该足以指导新用户正确使用命令，以及高级用户也可以完整快速的索引到全部选项和参数。</p>
+<h3><span id="mo-kuai-de-wen-dang-zi-fu-chuan">模块的文档字符串</span><a href="#mo-kuai-de-wen-dang-zi-fu-chuan" class="header-anchor"> </a></h3>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        模块的文档字符串
+    </div>
+    <div class="spoiler-content">
+        <p>The docstring for a module should generally list the classes, exceptions and functions (and any other objects) that are exported by the module, with a one-line summary of each. (These summaries generally give less detail than the summary line in the object’s docstring.) The docstring for a package (i.e., the docstring of the package’s __init__.py module) should also list the modules and subpackages exported by the package.</p>
+
+    </div>
+</div>
+<p>模块的文档字符串通常应列出由该模块导出的类、异常和函数（以及任何其他对象），并在一行中列出每一项。（这些摘要通常比对象文档字符串中的摘要行提供的详细信息更少）。软件包的文档字符串（即包的__init__.py模块的文档字符串）还应列出软件包导出的模块和子包。</p>
+<h3><span id="han-shu-he-fang-fa-de-wen-dang-zi-fu-chuan">函数和方法的文档字符串</span><a href="#han-shu-he-fang-fa-de-wen-dang-zi-fu-chuan" class="header-anchor"> </a></h3>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        函数和方法的文档字符串
+    </div>
+    <div class="spoiler-content">
+        <p>The docstring for a function or method should summarize its behavior and document its arguments, return value(s), side effects, exceptions raised, and restrictions on when it can be called (all if applicable). Optional arguments should be indicated. It should be documented whether keyword arguments are part of the interface.</p>
+
+    </div>
+</div>
+<p>函数或方法的文档字符串应总结其行为并记录其参数、返回值、副作用、引发的异常以及何时可以调用它的限制（所有如果适用）。应指明可选参数。应该记录关键字参数是否是接口的一部分。</p>
+<h3><span id="lei-de-wen-dang-zi-fu-chuan">类的文档字符串</span><a href="#lei-de-wen-dang-zi-fu-chuan" class="header-anchor"> </a></h3>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        类的文档字符串
+    </div>
+    <div class="spoiler-content">
+        <p>The docstring for a class should summarize its behavior and list the public methods and instance variables. If the class is intended to be subclassed, and has an additional interface for subclasses, this interface should be listed separately (in the docstring). The class constructor should be documented in the docstring for its __init__ method. Individual methods should be documented by their own docstring.<br>
+If a class subclasses another class and its behavior is mostly inherited from that class, its docstring should mention this and summarize the differences. Use the verb “override” to indicate that a subclass method replaces a superclass method and does not call the superclass method; use the verb “extend” to indicate that a subclass method calls the superclass method (in addition to its own behavior).</p>
+
+    </div>
+</div>
+<p>类的文档字符串应该总结其行为并列出公共方法和实例变量。如果该类旨在被子类化，并且有一个子类的附加接口，则该接口应该单独列出(在文档字符串中)。类构造函数应该在文档字符串中记录其__init__方法。私有方法应该由他们自己的文档字符串记录。<br>
+如果一个类对另一个类进行子类化，并且其行为主要从该类继承，则其文档字符串应该提及这一点并总结出差异。 使用动词“override”表示子类方法替换超类方法，不调用超类方法; 使用动词“extend”来表示一个子类方法调用超类方法(除了自己的行为)</p>
+<link rel="stylesheet" href="/ChrisJaunes/css/spoiler.css" type="text/css"><script src="/ChrisJaunes/js/spoiler.js" type="text/javascript" async></script>
+        </div>
+        <div class="article-tags">
+            <ul class="tags-list cl">
+                <li><a href="/ChrisJaunes/tags/python/"><i class="fa fa-tag"></i>python</a></li>
+            </ul>
+        </div>
+        <div class="article-pagination cl">
+            <div class="pagination-prev">
+                <a href="/ChrisJaunes/2022/01/23/Presto-SqlParser-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-SqlParser%E7%B1%BB/">上一篇：Presto-SqlParser源码浅析-SqlParser类</a>
+            </div>
+            <div class="pagination-next">
+                <a href="/ChrisJaunes/2021/09/23/%E4%BA%8B%E4%BB%B6%E6%9E%B6%E6%9E%84-1-w3c%E4%BA%8B%E4%BB%B6%E8%A7%84%E8%8C%83/">下一篇：事件架构-1-w3c事件规范</a>
+            </div>
+        </div> 
+        
+            <link rel="stylesheet" href="https://unpkg.com/gitalk@latest/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
+<script src="https://priesttomb.github.io/js/md5.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    new Gitalk({
+        clientID: '0ba2ec4192b1d2fb9cb6',
+        clientSecret: '85deadc0e6ed5bdf825a822ab2fdfbad69401fb9',
+        repo: 'ChrisJaunes',
+        owner: 'ChrisJaunes',
+        admin: 'ChrisJaunes',
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    }).render('gitalk-container')
+</script>
+        
+    </div>
+
+</article>
+    </section>
+        
+<section class="tool-area">
+
+    <div class="toolbar">
+        
+
+        
+        <div class="widget-post widget" style="order: 1 ">
+            <h2 class="widget-title"><i class="fa fa-file-text"></i> Recent articles</h2>
+            <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/08/02/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95-mock%E6%B5%85%E6%9E%90-1-%E6%A6%82%E8%BF%B0/">单元测试-mock浅析-1-概述</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/07/07/Adfuller-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Adfuller-学习笔记</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/26/ZooKeeper-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E7%9B%B8%E5%85%B3/">ZooKeeper-源码浅析-数据模型相关</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/25/ZooKeeper-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B/">ZooKeeper-数据模型</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/25/ZooKeeper-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">ZooKeeper-环境搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/02/D3-Format-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90/">D3-Format-源码浅析</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/02/01/Skulpt-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-Parser/">Skulpt-源码浅析-Parser</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/01/24/Presto-SqlParser-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-AstBuilder%E7%B1%BB/">Presto-SqlParser-源码浅析-AstBuilder类</a></li></ul>
+        </div>
+        
+
+        
+        <div class="widget-tags widget" style="order: 2 ">
+            <h2 class="widget-title"><i class="fa fa-tags"></i> Tag</h2>
+            <a href="/ChrisJaunes/tags/Blockly/" style="font-size: 15px;">Blockly</a> <a href="/ChrisJaunes/tags/C/" style="font-size: 15px;">C++</a> <a href="/ChrisJaunes/tags/D3/" style="font-size: 10px;">D3</a> <a href="/ChrisJaunes/tags/Http/" style="font-size: 17.5px;">Http</a> <a href="/ChrisJaunes/tags/HttpServer/" style="font-size: 17.5px;">HttpServer</a> <a href="/ChrisJaunes/tags/Java/" style="font-size: 20px;">Java</a> <a href="/ChrisJaunes/tags/Jupyter/" style="font-size: 12.5px;">Jupyter</a> <a href="/ChrisJaunes/tags/Linux/" style="font-size: 10px;">Linux</a> <a href="/ChrisJaunes/tags/Net/" style="font-size: 12.5px;">Net</a> <a href="/ChrisJaunes/tags/Presto/" style="font-size: 12.5px;">Presto</a> <a href="/ChrisJaunes/tags/Python/" style="font-size: 17.5px;">Python</a> <a href="/ChrisJaunes/tags/Servlet/" style="font-size: 12.5px;">Servlet</a> <a href="/ChrisJaunes/tags/Skulpt/" style="font-size: 10px;">Skulpt</a> <a href="/ChrisJaunes/tags/Sql%E8%A7%A3%E6%9E%90/" style="font-size: 12.5px;">Sql解析</a> <a href="/ChrisJaunes/tags/TensorFlow/" style="font-size: 10px;">TensorFlow</a> <a href="/ChrisJaunes/tags/ZooKeeper/" style="font-size: 15px;">ZooKeeper</a> <a href="/ChrisJaunes/tags/container/" style="font-size: 10px;">container</a> <a href="/ChrisJaunes/tags/metakernel/" style="font-size: 10px;">metakernel</a> <a href="/ChrisJaunes/tags/python/" style="font-size: 10px;">python</a> <a href="/ChrisJaunes/tags/web/" style="font-size: 10px;">web</a> <a href="/ChrisJaunes/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 15px;">分布式</a> <a href="/ChrisJaunes/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size: 10px;">单元测试</a> <a href="/ChrisJaunes/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90/" style="font-size: 10px;">时间序列分析</a>
+        </div>
+        
+
+        
+            <div class="widget-categories widget" style="order: 3 ">
+                <h2 class="widget-title"><i class="fa fa-folder-open"></i> Categories</h2>
+                 <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Blockly/">Blockly</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Blockly/BlocklyJupyter/">BlocklyJupyter</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/C/">C++</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/C/%E6%A0%87%E5%87%86%E5%BA%93/">标准库</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/D3/">D3</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/">Java</a><span class="category-list-count">6</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Http/">Http</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Http/HttpServer/">HttpServer</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Servlet/">Servlet</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Presto/">Presto</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Presto/SqlParser/">SqlParser</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/">Python</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Docx/">Docx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Json/">Json</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0/">内置函数</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Skulpt/">Skulpt</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TensorFlow/">TensorFlow</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TensorFlow/env/">env</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/programing-language/">programing_language</a><span class="category-list-count">6</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/programing-language/%E6%AF%94%E8%BE%83%E5%AD%A6%E4%B9%A0/">比较学习</a><span class="category-list-count">6</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a><span class="category-list-count">3</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%88%86%E5%B8%83%E5%BC%8F/ZooKeeper/">ZooKeeper</a><span class="category-list-count">3</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">单元测试</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90/">时间序列分析</a><span class="category-list-count">1</span></li></ul> 
+            </div>         
+        
+    </div>
+</section>
+</div>
+
+
+<footer class="footer">
+	<p class="footer-intro">
+		
+		@2022 ChrisJaunes.
+	</p>
+	<p class="footer-intro">
+			Powered By <a href="https://github.com/ChrisJaunes" target="_blank"> ChrisJaunes </a> |
+			Hexo Powered By <a href="https://hexo.io/zh-cn/" target="_blank">hexo</a> |
+			Theme Powered by ChrisJaunes 
+	</p>
+	<p class="footer-intro">
+		<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+		<span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次 &nbsp;|&nbsp;</span>
+		<span id="busuanzi_container_site_uv">访客数<span id="busuanzi_value_site_uv"></span>人次&nbsp;|&nbsp;</span>
+		<span id="busuanzi_container_page_pv">本文总阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+	</p>
+</footer>
+
+
+
+
+<div class="extend-tools" id="extend-tools" style="display: none;">
+    <ul>
+        <li class="tools-returnTop" title="Back to top"><i class="fa fa-angle-double-up"></i></li>
+    </ul>
+</div>
+
+	</div>
+
+
+<script src="/ChrisJaunes/js/org/jquery.min.js"></script>
+
+
+<script src="/ChrisJaunes/js/extend.js"></script>
+
+</body>
+</html>

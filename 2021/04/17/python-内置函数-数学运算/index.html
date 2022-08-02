@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="description" content="欢迎来的ChrisJaunes的世界">
+	<meta name="keywords" content="chrisjaunes">
+	<title>python 内置函数 数学运算 - ChrisJaunes</title>
+	
+	<link rel="shortcut icon" href="/ChrisJaunes/imgs/avatar.jpg"/>
+	
+<link rel="stylesheet" href="/ChrisJaunes/css/style.css">
+
+	
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+<body>
+	<div class="main-con">
+<nav class="nav cl">
+    <ul class="cl nav-list">
+        <li>
+            <a href="/ChrisJaunes/" class="">
+                <i class="fa fa-home"></i> 
+                <span>主页</span>
+            </a>
+        </li>
+        <li>
+            <a href="/ChrisJaunes/archives/" class="">
+                <i class=" fa-"></i> 
+                <span>归档</span>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" class="">
+                <i class=" fa-"></i> 
+                <span>关于</span>
+                <span class="drop-flag fa fa-angle-down"></span>
+            </a>
+            <dl>
+                <li>
+                    <a href="/ChrisJaunes/about" class="">
+                    <i class=" fa-"></i>
+                    <span>关于本站</span>
+                    </a>
+                </li>
+            </dl>
+        </li>
+    </ul>
+    <ul class="cl nav-tool">
+        <li>
+            <a target="_blank" rel="noopener" href="https://github.com/ChrisJaunes">
+                <i class="fa fa-github"></i>
+            </a>
+        </li>
+        <li>
+            <a href="mailto:judgehuang@tencent.com">
+                <i class="fa fa-envelope"></i>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" class="nav-search-btn">
+                <i class="fa fa-search"></i>
+            </a>
+        </li>
+    </ul>
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="nav-search"><input type="search" name="q" class="nav-search-input" placeholder="search..."><input type="hidden" name="sitesearch" value="https://chrisjaunes.github.io"></form>
+</nav>
+
+        
+<div class="con-wrap fadeToTop">
+    <section class="article-area">
+        
+<article class="article">
+    <div class="article-wrap">
+        <h2 class="article-title cl">
+            <a href="/ChrisJaunes/2021/04/17/python-%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0-%E6%95%B0%E5%AD%A6%E8%BF%90%E7%AE%97/" title="python 内置函数 数学运算">
+                python 内置函数 数学运算
+            </a>
+        </h2>
+        <ul class="article-extra" style="margin-bottom: 20px">
+            <li class="article-time">
+                2021-04-17
+            </li> 
+            <li class="article-category">
+                <ol class="category-list cl">
+                    <i class="fa fa-folder-o"></i>
+                        <li><a href="/categories/Python/">Python</a></li>
+                        <li><a href="/categories/programing_language/">programing_language</a></li>
+                </ol>
+            </li>
+        </ul>
+        <div class="article-description">
+            <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2><span id="shu-xue-yun-suan">数学运算</span><a href="#shu-xue-yun-suan" class="header-anchor"> </a></h2>
+<p>在python中提供了7个内置的数学运算函数<br>
+在java中标准库提供了相似的函数<br>
+在c++中标准库提供了相似的函数</p>
+<ol>
+<li>
+<p>abs</p>
+<p>功能：求数值的绝对值</p>
+<p>python中作为内置函数，参数可以是任何实现了__abs__()的对象，例如int、float等。</p>
+<p>函数原型：<a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/functions.html#abs">参考文献</a></p>
+ <pre><code class="hljs python"><span class="hljs-built_in">abs</span>(x)</code></pre>
+ <pre><code class="hljs python">a = <span class="hljs-number">1</span>
+print(a, <span class="hljs-built_in">type</span>(a), <span class="hljs-built_in">abs</span>(a))
+b = -<span class="hljs-number">1.0</span>
+print(b, <span class="hljs-built_in">type</span>(b), <span class="hljs-built_in">abs</span>(b))
+c = <span class="hljs-number">2</span>+<span class="hljs-number">0j</span>
+print(c, <span class="hljs-built_in">type</span>(c), <span class="hljs-built_in">abs</span>(c))
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">X</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span>(<span class="hljs-params">self, _x</span>):</span>
+        self._x = _x
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__abs__</span>(<span class="hljs-params">self</span>) :</span>
+        <span class="hljs-keyword">if</span> self._x &lt; <span class="hljs-number">0</span> : <span class="hljs-keyword">return</span> -self._x
+        <span class="hljs-keyword">return</span> self._x
+
+
+d = X(-<span class="hljs-number">2</span>)
+print(d, <span class="hljs-built_in">type</span>(d), <span class="hljs-built_in">abs</span>(d))</code></pre>
+ <pre><code class="hljs shell"><span class="hljs-meta">$</span><span class="bash"> python test-abs.py</span>
+(1, &lt;type &#x27;int&#x27;&gt;, 1)
+(-1.0, &lt;type &#x27;float&#x27;&gt;, 1.0)
+((2+0j), &lt;type &#x27;complex&#x27;&gt;, 2.0)
+(&lt;__main__.X instance at 0x0000000003B38488&gt;, &lt;type &#x27;instance&#x27;&gt;, 2)</code></pre>
+<p>java中abs位于java.lang.Math包中，参数可以是任何原生数据类型, 可以是int, float, long, double, short, byte类型。</p>
+<p>函数原型：<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html#abs-double-">参考文献</a></p>
+ <pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">abs</span><span class="hljs-params">(<span class="hljs-keyword">int</span> a)</span></span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">long</span> <span class="hljs-title">abs</span><span class="hljs-params">(<span class="hljs-keyword">long</span> a)</span></span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">float</span> <span class="hljs-title">abs</span><span class="hljs-params">(<span class="hljs-keyword">float</span> a)</span></span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">double</span> <span class="hljs-title">abs</span><span class="hljs-params">(<span class="hljs-keyword">double</span> a)</span></span></code></pre>
+ <pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">test_abs</span></span>&#123;
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String args[])</span></span>&#123;
+        Integer a = -<span class="hljs-number">1</span>;
+        <span class="hljs-keyword">double</span> b = <span class="hljs-number">2</span>;
+        <span class="hljs-keyword">long</span> c = -<span class="hljs-number">9223372036854775808L</span>;
+        <span class="hljs-keyword">long</span> d = -<span class="hljs-number">9223372036854775807L</span>;
+        System.out.println(Math.abs(a));
+        System.out.println(Math.abs(b));
+        System.out.println(Math.abs(c));
+        System.out.println(Math.abs(d));
+    &#125;
+&#125;</code></pre>
+<p>注：abs©超过了long的表示范围，发生了溢出</p>
+ <pre><code class="hljs shell"><span class="hljs-meta">$</span><span class="bash"> javac test_abs.java</span>
+<span class="hljs-meta">$</span><span class="bash"> java test_abs</span>
+1
+2.0
+-9223372036854775808
+9223372036854775807</code></pre>
+<p>c++中abs位于cmath中。</p>
+<p>函数原型<br>
+<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cmath/abs/">参考</a></p>
+ <pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">double</span> <span class="hljs-title">abs</span> <span class="hljs-params">(<span class="hljs-keyword">double</span> x)</span></span>;
+<span class="hljs-function"><span class="hljs-keyword">float</span> <span class="hljs-title">abs</span> <span class="hljs-params">(<span class="hljs-keyword">float</span> x)</span></span>;
+<span class="hljs-function"><span class="hljs-keyword">long</span> <span class="hljs-keyword">double</span> <span class="hljs-title">abs</span> <span class="hljs-params">(<span class="hljs-keyword">long</span> <span class="hljs-keyword">double</span> x)</span></span>;
+<span class="hljs-function"><span class="hljs-keyword">double</span> <span class="hljs-title">abs</span> <span class="hljs-params">(T x)</span></span>;</code></pre>
+ <pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cmath&gt;</span></span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;
+    <span class="hljs-keyword">int</span> a = <span class="hljs-number">-1</span>;
+    <span class="hljs-keyword">double</span> b = <span class="hljs-number">2</span>;
+    <span class="hljs-keyword">long</span> <span class="hljs-keyword">long</span> c = <span class="hljs-number">-9223372036854775807L</span>;
+    <span class="hljs-keyword">using</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span>, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span>;
+    <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-built_in">abs</span>(a) &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-built_in">abs</span>(b) &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-built_in">abs</span>(c) &lt;&lt; <span class="hljs-built_in">endl</span>;
+&#125;</code></pre>
+<p>注：abs不支持long long类型，会发生隐式类型转换变成int类型，从而丢失精度</p>
+ <pre><code class="hljs shell"><span class="hljs-meta">$</span><span class="bash"> g++ -g test_abs.cpp -o test_abs.exe -std=c++17</span>
+<span class="hljs-meta">$</span><span class="bash"> test_abs.exe</span>
+1
+2
+1</code></pre>
+</li>
+<li>
+<p>divmod</p>
+<p>功能：返回两个数值的商和余数 <a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/functions.html#divmod">参考</a></p>
+ <pre><code class="hljs python"><span class="hljs-keyword">import</span> math
+a1 = <span class="hljs-built_in">divmod</span>(<span class="hljs-number">5</span>, <span class="hljs-number">2</span>)
+a2 = (<span class="hljs-number">5</span> // <span class="hljs-number">2</span>, <span class="hljs-number">5</span> % <span class="hljs-number">2</span>)
+print(a1, <span class="hljs-built_in">type</span>(a1), a2, <span class="hljs-built_in">type</span>(a2))
+b1 = <span class="hljs-built_in">divmod</span>(-<span class="hljs-number">5.5</span>, <span class="hljs-number">2.1</span>)
+b2 = (math.floor(-<span class="hljs-number">5.5</span>/<span class="hljs-number">2.1</span>), -<span class="hljs-number">5.5</span> % <span class="hljs-number">2.1</span>)
+print(b1, <span class="hljs-built_in">type</span>(b1), b2, <span class="hljs-built_in">type</span>(b2))
+c1 = <span class="hljs-built_in">divmod</span>(<span class="hljs-number">5.5</span>, -<span class="hljs-number">2.1</span>)
+c2 = (math.floor(<span class="hljs-number">5.5</span>/-<span class="hljs-number">2.1</span>), <span class="hljs-number">5.5</span> % -<span class="hljs-number">2.1</span>)
+print(c1, <span class="hljs-built_in">type</span>(c1), c2, <span class="hljs-built_in">type</span>(c2))</code></pre>
+ <pre><code class="hljs shell"><span class="hljs-meta">$</span><span class="bash"> python test_divmod.py</span>
+((2, 1), &lt;type &#x27;tuple&#x27;&gt;, (2, 1), &lt;type &#x27;tuple&#x27;&gt;)
+((-3.0, 0.8000000000000003), &lt;type &#x27;tuple&#x27;&gt;, (-3.0, 0.8000000000000003), &lt;type &#x27;tuple&#x27;&gt;)
+((-3.0, -0.8000000000000003), &lt;type &#x27;tuple&#x27;&gt;, (-3.0, -0.8000000000000003), &lt;type &#x27;tuple&#x27;&gt;)</code></pre>
+<p>java和c++没有类似的函数</p>
+</li>
+<li>
+<p>max</p>
+<p>功能：返回可迭代对象中的元素中的最大值或者所有参数的最大值</p>
+<p>函数原型<a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/functions.html#max">参考</a></p>
+ <pre><code class="hljs python"><span class="hljs-built_in">max</span>(iterable, *[, key, default])
+<span class="hljs-built_in">max</span>(arg1, arg2, *args[, key])</code></pre>
+<p>python作为众所周知的弱类型语言，比较操作是会容易出现问题<a target="_blank" rel="noopener" href="https://docs.python.org/3.9/reference/expressions.html#value-comparisons">参考</a></p>
+<p>对于float类型，float(“nan”)与任何浮点类型比较都会返回False，float(“nan”)!=float(“nan”)返回True</p>
+<p>对于set类型， Accordingly, sets are not appropriate arguments for functions which depend on total ordering (for example, min(), max(), and sorted() produce undefined results given a list of sets as inputs).</p>
+<p>对于1和True，type(max(1, True)) != type(max(true, 1))</p>
+ <pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">test</span>(<span class="hljs-params">a, b</span>) :</span>
+    print(<span class="hljs-built_in">max</span>(a, b), <span class="hljs-built_in">max</span>(b, a), <span class="hljs-built_in">type</span>(<span class="hljs-built_in">max</span>(a, b)), <span class="hljs-built_in">type</span>(<span class="hljs-built_in">max</span>(b, a)), <span class="hljs-built_in">max</span>(a, b) == <span class="hljs-built_in">max</span>(b, a))
+
+test(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>)
+test(<span class="hljs-number">1.0</span>, <span class="hljs-built_in">float</span>(<span class="hljs-string">&quot;nan&quot;</span>))
+test(&#123;<span class="hljs-number">1</span>&#125;, &#123;<span class="hljs-number">2</span>&#125;)
+test(<span class="hljs-number">1</span>, <span class="hljs-literal">True</span>)
+print(<span class="hljs-built_in">max</span>(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>))
+print(<span class="hljs-built_in">max</span>((<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>)))
+print(<span class="hljs-built_in">max</span>([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>]))
+print(<span class="hljs-built_in">max</span>(&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>&#125;))
+print(<span class="hljs-built_in">max</span>(&#123;<span class="hljs-number">1</span>: <span class="hljs-number">6</span>, <span class="hljs-number">3</span>: <span class="hljs-number">4</span>, <span class="hljs-number">5</span>: <span class="hljs-number">2</span>&#125;))
+print(<span class="hljs-built_in">max</span>([<span class="hljs-string">&quot;1&quot;</span>,<span class="hljs-string">&quot;2&quot;</span>,<span class="hljs-string">&quot;3&quot;</span>,<span class="hljs-string">&quot;4&quot;</span>], key = <span class="hljs-built_in">len</span>))
+print(<span class="hljs-built_in">max</span>(&#123;-<span class="hljs-number">100</span>, <span class="hljs-number">1</span>, <span class="hljs-number">10</span>&#125;, key = <span class="hljs-keyword">lambda</span> x: <span class="hljs-built_in">abs</span>(x)))</code></pre>
+ <pre><code class="hljs shell"><span class="hljs-meta">$</span><span class="bash"> python test_max.py</span>
+2 2 &lt;class &#x27;int&#x27;&gt; &lt;class &#x27;int&#x27;&gt; True
+1.0 nan &lt;class &#x27;float&#x27;&gt; &lt;class &#x27;float&#x27;&gt; False
+&#123;1&#125; &#123;2&#125; &lt;class &#x27;set&#x27;&gt; &lt;class &#x27;set&#x27;&gt; False
+1 True &lt;class &#x27;int&#x27;&gt; &lt;class &#x27;bool&#x27;&gt; True
+3
+4
+5
+6
+5
+1
+-100</code></pre>
+<p>在java中，<br>
+java.lang.Math包中提供了max，参数可以两个原生数据类型。<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html#max-int-int-">参考</a><br>
+java.util.Collections包中提供了max, 函数原型<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/Collections.html#max-java.util.Collection-">参考</a></p>
+ <pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> &lt;T extends Object &amp; Comparable&lt;? <span class="hljs-keyword">super</span> T&gt;&gt; <span class="hljs-function">T <span class="hljs-title">max</span><span class="hljs-params">(Collection&lt;? extends T&gt; coll)</span></span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> &lt;T&gt; T <span class="hljs-title">max</span><span class="hljs-params">(Collection&lt;? extends T&gt; coll, Comparator&lt;? <span class="hljs-keyword">super</span> T&gt; comp)</span></span></code></pre>
+ <pre><code class="hljs java"><span class="hljs-keyword">import</span> java.util.*;
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">test_max</span></span>&#123;
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] argv)</span> </span>&#123;
+        List&lt;Integer&gt; list = <span class="hljs-keyword">new</span> ArrayList&lt;&gt;();
+        list.add(<span class="hljs-number">1</span>);
+        list.add(-<span class="hljs-number">2</span>);
+        list.add(<span class="hljs-number">3</span>);
+        list.add(-<span class="hljs-number">4</span>);
+        System.out.println(Collections.max(list));
+        System.out.println(Collections.max(list, (a, b) -&gt; &#123;<span class="hljs-keyword">return</span> Math.abs(a) - Math.abs(b);&#125;));
+    &#125;
+&#125;</code></pre>
+ <pre><code class="hljs shell"><span class="hljs-meta">$</span><span class="bash"> javac test_max.java</span>
+<span class="hljs-meta">$</span><span class="bash"> java test_max</span>
+3
+-4</code></pre>
+<p>在c++中，algorithm提供了max函数，函数原型如下：</p>
+ <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">T</span>&gt;</span> <span class="hljs-function"><span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">const</span> T&amp; <span class="hljs-title">max</span> <span class="hljs-params">(<span class="hljs-keyword">const</span> T&amp; a, <span class="hljs-keyword">const</span> T&amp; b)</span></span>;
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">T</span>, <span class="hljs-keyword">class</span> <span class="hljs-title">Compare</span>&gt;</span> <span class="hljs-function"><span class="hljs-keyword">constexpr</span> <span class="hljs-keyword">const</span> T&amp; <span class="hljs-title">max</span> <span class="hljs-params">(<span class="hljs-keyword">const</span> T&amp; a, <span class="hljs-keyword">const</span> T&amp; b, Compare comp)</span></span>;
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">T</span>&gt;</span> <span class="hljs-function"><span class="hljs-keyword">constexpr</span> T <span class="hljs-title">max</span> <span class="hljs-params">(<span class="hljs-built_in">initializer_list</span>&lt;T&gt; il)</span></span>;
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">T</span>, <span class="hljs-keyword">class</span> <span class="hljs-title">Compare</span>&gt;</span> <span class="hljs-function"><span class="hljs-keyword">constexpr</span> T <span class="hljs-title">max</span> <span class="hljs-params">(<span class="hljs-built_in">initializer_list</span>&lt;T&gt; il, Compare comp)</span></span>;</code></pre>
+<p>还提供了max_element， 函数原型如下：</p>
+ <pre><code class="hljs c++"><span class="hljs-keyword">template</span> &lt;<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ForwardIterator</span>&gt;</span> <span class="hljs-function">ForwardIterator <span class="hljs-title">max_element</span> <span class="hljs-params">(ForwardIterator first, ForwardIterator last)</span></span>;
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ForwardIterator</span>, <span class="hljs-keyword">class</span> <span class="hljs-title">Compare</span>&gt;</span> <span class="hljs-function">ForwardIterator <span class="hljs-title">max_element</span> <span class="hljs-params">(ForwardIterator first, ForwardIterator last,Compare comp)</span></span>;</code></pre>
+ <pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;algorithm&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;set&gt;</span></span>
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span> <span class="hljs-params">()</span> </span>&#123;
+    <span class="hljs-keyword">using</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span>;
+    <span class="hljs-keyword">using</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span>;
+    <span class="hljs-keyword">using</span> <span class="hljs-built_in">std</span>::max;
+    <span class="hljs-built_in">cout</span> &lt;&lt; max(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>) &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">CMP</span>&#123;</span>
+        <span class="hljs-function"><span class="hljs-keyword">bool</span> <span class="hljs-title">operator</span><span class="hljs-params">()</span><span class="hljs-params">(<span class="hljs-keyword">int</span> x, <span class="hljs-keyword">int</span> y)</span> <span class="hljs-keyword">const</span></span>&#123;
+            <span class="hljs-keyword">return</span> <span class="hljs-built_in">abs</span>(x) &lt; <span class="hljs-built_in">abs</span>(y);
+        &#125;
+    &#125; cmp;
+    <span class="hljs-built_in">cout</span> &lt;&lt; max(<span class="hljs-number">-10</span>, <span class="hljs-number">1</span>, cmp) &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-built_in">cout</span> &lt;&lt; max(&#123;<span class="hljs-number">-4</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;) &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-built_in">cout</span> &lt;&lt; max(&#123;<span class="hljs-number">-4</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;, cmp) &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">set</span>&lt;<span class="hljs-keyword">int</span>&gt; st&#123;<span class="hljs-number">10</span>, <span class="hljs-number">-20</span>, <span class="hljs-number">30</span>, <span class="hljs-number">-40</span>&#125;;
+    <span class="hljs-built_in">cout</span> &lt;&lt; *<span class="hljs-built_in">std</span>::max_element(st.begin(), st.end()) &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-built_in">cout</span> &lt;&lt; *<span class="hljs-built_in">std</span>::max_element(st.begin(), st.end(), cmp) &lt;&lt; <span class="hljs-built_in">endl</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+&#125;</code></pre>
+ <pre><code class="hljs shell"><span class="hljs-meta">$</span><span class="bash"> g++ -g test_max.cpp -o test_max.exe --std=c++14</span>
+2
+-10
+3
+-4
+30
+-40</code></pre>
+</li>
+<li>
+<p>min</p>
+<p>功能：返回可迭代对象中的元素中的最小值或者所有参数的最小值<br>
+和max极其类似</p>
+</li>
+<li>
+<p>pow</p>
+<p>功能：返回两个数值的幂运算值或其与指定整数的模值</p>
+<p>函数原型<a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/functions.html#pow">参考</a></p>
+ <pre><code class="hljs python"><span class="hljs-built_in">pow</span>(base, exp[, mod])</code></pre>
+<p>在 3.8 版更改: 对于 int 操作数，三参数形式的 pow 现在允许第二个参数为负值，即可以计算倒数的余数。允许关键字参数。 之前只支持位置参数。</p>
+ <pre><code class="hljs python">print(<span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>, <span class="hljs-number">10</span>))
+print(<span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>, -<span class="hljs-number">1</span>))
+print(<span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>, <span class="hljs-number">0.5</span>))
+print(<span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>, <span class="hljs-number">10</span>, <span class="hljs-number">97</span>))
+print(<span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">97</span>))</code></pre>
+<p>注：pow(2, -1, 97)必须在3.8或者更高版本下执行</p>
+ <pre><code class="hljs shell"><span class="hljs-meta">$</span><span class="bash"> python test_pow.py</span>
+1024
+0.5
+1.41421356237
+54
+23</code></pre>
+<p>java中java.lang.Math提供了类似的方法<br>
+函数原型<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html#pow-double-double-">参考</a></p>
+ <pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">double</span>	<span class="hljs-title">pow</span><span class="hljs-params">(<span class="hljs-keyword">double</span> a, <span class="hljs-keyword">double</span> b)</span></span></code></pre>
+<p>c++中cmath提供了类似的函数<br>
+函数原型<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cmath/pow/">参考</a></p>
+ <pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-keyword">double</span> <span class="hljs-title">pow</span> <span class="hljs-params">(<span class="hljs-keyword">double</span> base, <span class="hljs-keyword">double</span> exponent)</span></span>;
+<span class="hljs-function"><span class="hljs-keyword">float</span> <span class="hljs-title">pow</span> <span class="hljs-params">(<span class="hljs-keyword">float</span> base, <span class="hljs-keyword">float</span> exponent)</span></span>;
+<span class="hljs-function"><span class="hljs-keyword">long</span> <span class="hljs-keyword">double</span> <span class="hljs-title">pow</span> <span class="hljs-params">(<span class="hljs-keyword">long</span> <span class="hljs-keyword">double</span> base, <span class="hljs-keyword">long</span> <span class="hljs-keyword">double</span> exponent)</span></span>;
+<span class="hljs-function"><span class="hljs-keyword">double</span> <span class="hljs-title">pow</span> <span class="hljs-params">(Type1 base, Type2 exponent)</span></span>;</code></pre>
+</li>
+<li>
+<p>round</p>
+<p>返回 number 舍入到小数点后 ndigits 位精度的值。 如果 ndigits 被省略或为 None，则返回最接近输入值的整数。</p>
+<p>函数原型<a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/functions.html#round">参考</a></p>
+ <pre><code class="hljs python"><span class="hljs-built_in">round</span>(number[, ndigits])</code></pre>
+<p>java函数原型<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html#round-double-">参考</a></p>
+ <pre><code class="hljs java"><span class="hljs-string">&quot;&quot;</span><span class="hljs-string">&quot;</span>
+<span class="hljs-string">If the argument is NaN, the result is 0.</span>
+<span class="hljs-string">If the argument is negative infinity or any value less than or equal to the value of Integer.MIN_VALUE, the result is equal to the value of Integer.MIN_VALUE.</span>
+<span class="hljs-string">If the argument is positive infinity or any value greater than or equal to the value of Integer.MAX_VALUE, the result is equal to the value of Integer.MAX_VALUE.</span>
+<span class="hljs-string">&quot;</span><span class="hljs-string">&quot;&quot;</span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span>	<span class="hljs-title">round</span><span class="hljs-params">(<span class="hljs-keyword">float</span> a)</span></span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">long</span>	<span class="hljs-title">round</span><span class="hljs-params">(<span class="hljs-keyword">double</span> a)</span></span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">double</span>	<span class="hljs-title">scalb</span><span class="hljs-params">(<span class="hljs-keyword">double</span> d, <span class="hljs-keyword">int</span> scaleFactor)</span></span>
+<span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">float</span>	<span class="hljs-title">scalb</span><span class="hljs-params">(<span class="hljs-keyword">float</span> f, <span class="hljs-keyword">int</span> scaleFactor)</span></span></code></pre>
+<p>c++函数原型<a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cmath/round/">参考</a></p>
+</li>
+<li>
+<p>sum<br>
+对元素类型是数值的可迭代对象中的每个元素求和</p>
+<p>函数原型<a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/functions.html#sum">参考</a></p>
+ <pre><code class="hljs python"><span class="hljs-built_in">sum</span>(iterable, /, start=<span class="hljs-number">0</span>)</code></pre></li>
+</ol>
+<link rel="stylesheet" href="/ChrisJaunes/css/spoiler.css" type="text/css"><script src="/ChrisJaunes/js/spoiler.js" type="text/javascript" async></script>
+        </div>
+        <div class="article-tags">
+            <ul class="tags-list cl">
+                <li><a href="/ChrisJaunes/tags/Java/"><i class="fa fa-tag"></i>Java</a></li>
+                <li><a href="/ChrisJaunes/tags/Python/"><i class="fa fa-tag"></i>Python</a></li>
+                <li><a href="/ChrisJaunes/tags/C++/"><i class="fa fa-tag"></i>C++</a></li>
+            </ul>
+        </div>
+        <div class="article-pagination cl">
+            <div class="pagination-prev">
+                <a href="/ChrisJaunes/2021/04/25/%E6%A0%87%E5%87%86%E5%BA%93-%E5%AE%B9%E5%99%A8%E6%B5%85%E6%9E%90-1-%E6%A6%82%E8%BF%B0/">上一篇：标准库-容器浅析-1-概述</a>
+            </div>
+            <div class="pagination-next">
+                <a href="/ChrisJaunes/2021/03/19/Java-HttpServer-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-Exchange%E7%B1%BB/">下一篇：Java-HttpServer-源码浅析 之 Exchange</a>
+            </div>
+        </div> 
+        
+            <link rel="stylesheet" href="https://unpkg.com/gitalk@latest/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
+<script src="https://priesttomb.github.io/js/md5.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    new Gitalk({
+        clientID: '0ba2ec4192b1d2fb9cb6',
+        clientSecret: '85deadc0e6ed5bdf825a822ab2fdfbad69401fb9',
+        repo: 'ChrisJaunes',
+        owner: 'ChrisJaunes',
+        admin: 'ChrisJaunes',
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    }).render('gitalk-container')
+</script>
+        
+    </div>
+
+</article>
+    </section>
+        
+<section class="tool-area">
+
+    <div class="toolbar">
+        
+
+        
+        <div class="widget-post widget" style="order: 1 ">
+            <h2 class="widget-title"><i class="fa fa-file-text"></i> Recent articles</h2>
+            <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/08/02/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95-mock%E6%B5%85%E6%9E%90-1-%E6%A6%82%E8%BF%B0/">单元测试-mock浅析-1-概述</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/07/07/Adfuller-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Adfuller-学习笔记</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/26/ZooKeeper-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E7%9B%B8%E5%85%B3/">ZooKeeper-源码浅析-数据模型相关</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/25/ZooKeeper-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B/">ZooKeeper-数据模型</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/25/ZooKeeper-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">ZooKeeper-环境搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/02/D3-Format-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90/">D3-Format-源码浅析</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/02/01/Skulpt-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-Parser/">Skulpt-源码浅析-Parser</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/01/24/Presto-SqlParser-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-AstBuilder%E7%B1%BB/">Presto-SqlParser-源码浅析-AstBuilder类</a></li></ul>
+        </div>
+        
+
+        
+        <div class="widget-tags widget" style="order: 2 ">
+            <h2 class="widget-title"><i class="fa fa-tags"></i> Tag</h2>
+            <a href="/ChrisJaunes/tags/Blockly/" style="font-size: 15px;">Blockly</a> <a href="/ChrisJaunes/tags/C/" style="font-size: 15px;">C++</a> <a href="/ChrisJaunes/tags/D3/" style="font-size: 10px;">D3</a> <a href="/ChrisJaunes/tags/Http/" style="font-size: 17.5px;">Http</a> <a href="/ChrisJaunes/tags/HttpServer/" style="font-size: 17.5px;">HttpServer</a> <a href="/ChrisJaunes/tags/Java/" style="font-size: 20px;">Java</a> <a href="/ChrisJaunes/tags/Jupyter/" style="font-size: 12.5px;">Jupyter</a> <a href="/ChrisJaunes/tags/Linux/" style="font-size: 10px;">Linux</a> <a href="/ChrisJaunes/tags/Net/" style="font-size: 12.5px;">Net</a> <a href="/ChrisJaunes/tags/Presto/" style="font-size: 12.5px;">Presto</a> <a href="/ChrisJaunes/tags/Python/" style="font-size: 17.5px;">Python</a> <a href="/ChrisJaunes/tags/Servlet/" style="font-size: 12.5px;">Servlet</a> <a href="/ChrisJaunes/tags/Skulpt/" style="font-size: 10px;">Skulpt</a> <a href="/ChrisJaunes/tags/Sql%E8%A7%A3%E6%9E%90/" style="font-size: 12.5px;">Sql解析</a> <a href="/ChrisJaunes/tags/TensorFlow/" style="font-size: 10px;">TensorFlow</a> <a href="/ChrisJaunes/tags/ZooKeeper/" style="font-size: 15px;">ZooKeeper</a> <a href="/ChrisJaunes/tags/container/" style="font-size: 10px;">container</a> <a href="/ChrisJaunes/tags/metakernel/" style="font-size: 10px;">metakernel</a> <a href="/ChrisJaunes/tags/python/" style="font-size: 10px;">python</a> <a href="/ChrisJaunes/tags/web/" style="font-size: 10px;">web</a> <a href="/ChrisJaunes/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 15px;">分布式</a> <a href="/ChrisJaunes/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size: 10px;">单元测试</a> <a href="/ChrisJaunes/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90/" style="font-size: 10px;">时间序列分析</a>
+        </div>
+        
+
+        
+            <div class="widget-categories widget" style="order: 3 ">
+                <h2 class="widget-title"><i class="fa fa-folder-open"></i> Categories</h2>
+                 <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Blockly/">Blockly</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Blockly/BlocklyJupyter/">BlocklyJupyter</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/C/">C++</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/C/%E6%A0%87%E5%87%86%E5%BA%93/">标准库</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/D3/">D3</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/">Java</a><span class="category-list-count">6</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Http/">Http</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Http/HttpServer/">HttpServer</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Servlet/">Servlet</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Presto/">Presto</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Presto/SqlParser/">SqlParser</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/">Python</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Docx/">Docx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Json/">Json</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0/">内置函数</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Skulpt/">Skulpt</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TensorFlow/">TensorFlow</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TensorFlow/env/">env</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/programing-language/">programing_language</a><span class="category-list-count">6</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/programing-language/%E6%AF%94%E8%BE%83%E5%AD%A6%E4%B9%A0/">比较学习</a><span class="category-list-count">6</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a><span class="category-list-count">3</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%88%86%E5%B8%83%E5%BC%8F/ZooKeeper/">ZooKeeper</a><span class="category-list-count">3</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">单元测试</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90/">时间序列分析</a><span class="category-list-count">1</span></li></ul> 
+            </div>         
+        
+    </div>
+</section>
+</div>
+
+
+<footer class="footer">
+	<p class="footer-intro">
+		
+		@2022 ChrisJaunes.
+	</p>
+	<p class="footer-intro">
+			Powered By <a href="https://github.com/ChrisJaunes" target="_blank"> ChrisJaunes </a> |
+			Hexo Powered By <a href="https://hexo.io/zh-cn/" target="_blank">hexo</a> |
+			Theme Powered by ChrisJaunes 
+	</p>
+	<p class="footer-intro">
+		<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+		<span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次 &nbsp;|&nbsp;</span>
+		<span id="busuanzi_container_site_uv">访客数<span id="busuanzi_value_site_uv"></span>人次&nbsp;|&nbsp;</span>
+		<span id="busuanzi_container_page_pv">本文总阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+	</p>
+</footer>
+
+
+
+
+<div class="extend-tools" id="extend-tools" style="display: none;">
+    <ul>
+        <li class="tools-returnTop" title="Back to top"><i class="fa fa-angle-double-up"></i></li>
+    </ul>
+</div>
+
+	</div>
+
+
+<script src="/ChrisJaunes/js/org/jquery.min.js"></script>
+
+
+<script src="/ChrisJaunes/js/extend.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="description" content="欢迎来的ChrisJaunes的世界">
+	<meta name="keywords" content="chrisjaunes">
+	<title>标准库-容器浅析-1-概述 - ChrisJaunes</title>
+	
+	<link rel="shortcut icon" href="/ChrisJaunes/imgs/avatar.jpg"/>
+	
+<link rel="stylesheet" href="/ChrisJaunes/css/style.css">
+
+	
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+<body>
+	<div class="main-con">
+<nav class="nav cl">
+    <ul class="cl nav-list">
+        <li>
+            <a href="/ChrisJaunes/" class="">
+                <i class="fa fa-home"></i> 
+                <span>主页</span>
+            </a>
+        </li>
+        <li>
+            <a href="/ChrisJaunes/archives/" class="">
+                <i class=" fa-"></i> 
+                <span>归档</span>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" class="">
+                <i class=" fa-"></i> 
+                <span>关于</span>
+                <span class="drop-flag fa fa-angle-down"></span>
+            </a>
+            <dl>
+                <li>
+                    <a href="/ChrisJaunes/about" class="">
+                    <i class=" fa-"></i>
+                    <span>关于本站</span>
+                    </a>
+                </li>
+            </dl>
+        </li>
+    </ul>
+    <ul class="cl nav-tool">
+        <li>
+            <a target="_blank" rel="noopener" href="https://github.com/ChrisJaunes">
+                <i class="fa fa-github"></i>
+            </a>
+        </li>
+        <li>
+            <a href="mailto:judgehuang@tencent.com">
+                <i class="fa fa-envelope"></i>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" class="nav-search-btn">
+                <i class="fa fa-search"></i>
+            </a>
+        </li>
+    </ul>
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="nav-search"><input type="search" name="q" class="nav-search-input" placeholder="search..."><input type="hidden" name="sitesearch" value="https://chrisjaunes.github.io"></form>
+</nav>
+
+        
+<div class="con-wrap fadeToTop">
+    <section class="article-area">
+        
+<article class="article">
+    <div class="article-wrap">
+        <h2 class="article-title cl">
+            <a href="/ChrisJaunes/2021/04/25/%E6%A0%87%E5%87%86%E5%BA%93-%E5%AE%B9%E5%99%A8%E6%B5%85%E6%9E%90-1-%E6%A6%82%E8%BF%B0/" title="标准库-容器浅析-1-概述">
+                标准库-容器浅析-1-概述
+            </a>
+        </h2>
+        <ul class="article-extra" style="margin-bottom: 20px">
+            <li class="article-time">
+                2021-04-25
+            </li> 
+            <li class="article-category">
+                <ol class="category-list cl">
+                    <i class="fa fa-folder-o"></i>
+                        <li><a href="/categories/programing_language/">programing_language</a></li>
+                </ol>
+            </li>
+        </ul>
+        <div class="article-description">
+            <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1><span id="gai-shu">概述</span><a href="#gai-shu" class="header-anchor"> </a></h1>
+<h2><span id="rong-qi-de-li-jie">容器的理解</span><a href="#rong-qi-de-li-jie" class="header-anchor"> </a></h2>
+<p>容器被定义为：在数据存储上，有一种对象类型，它可以持有其他对象或者指向其他对象的指针，这种对象类型就叫做容器。容器就是保存其他对象的对象，还包含了一系列处理其他对象的方法，因为这些方法在程序设计上经常被用到，所以容器也体现出了一个好处，就是“容器类是一个对特定代码重用问题的良好的解决方案”<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="C++容器详解 [传送门](https://www.cnblogs.com/sea520/p/12711554.html)">[1]</span></a></sup></p>
+<p>容器是随着面向对象的诞生而提出的，容器类在面向对象中特别重要，甚至被认为是面向对象的基础。在现在几乎所有的面向对象语言中都伴随着一个容器集。<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="C++容器详解 [传送门](https://www.cnblogs.com/sea520/p/12711554.html)">[1]</span></a></sup></p>
+<p>容器必须提供某种访问元素的方式，便于其他代码使用其中的元素。容器应提供一种能够遍历元素的方式，保证它不会周而复始地访问同一个元素。从单一职责原则来看，为了避免模糊容器高效存储数据的主要职责，把容器的遍历行为抽取为单独对象可能是比较好的解决方案。</p>
+<h2><span id="die-dai-qi-mo-shi-2">迭代器模式<sup id="fnref:2"><a href="#fn:2" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="迭代器模式 [传送门](https://refactoringguru.cn/design-patterns/iterator)">[2]</span></a></sup></span><a href="#die-dai-qi-mo-shi-2" class="header-anchor"> </a></h2>
+<h3><span id="die-dai-qi-jie-shao">迭代器介绍</span><a href="#die-dai-qi-jie-shao" class="header-anchor"> </a></h3>
+<p>迭代器是一种行为设计模式，能让你在不暴露底层表现形式的情况下遍历集合种所有的元素。</p>
+<img src="http://www.plantuml.com/plantuml/svg/ZP9B3i8W48Rtd89b6rCEq1ZJf2iNkl40Xk9eco0aC2Ocwjsb3QqKMCY66MR-RnwXiSWDFkwI30h1NBa0kdS6HsrUXBgpeJV08ponABtVSziVj86Yh6cdjIGV8YItbhPQ2GC8Qq15XPOI10vQrKjEkxpvf64IEV-47C6NYec5o17A_nkDfknaWF7pEZWFAZhjR2U3nbh6s7IVtSd3w8esctHRkIt90HIIjAyaEYdUZ2NhoOh3n63hFvABfpeIiySkTZbG0-eoVg0l">
+<h3><span id="die-dai-qi-mo-shi-gua-yong-de-chang-jing">迭代器模式适用的场景</span><a href="#die-dai-qi-mo-shi-gua-yong-de-chang-jing" class="header-anchor"> </a></h3>
+<ol>
+<li>
+<p>当集合背后为复杂的数据结构， 且你希望对客户端隐藏其复杂性时 （出于使用便利性或安全性的考虑）， 可以使用迭代器模式。</p>
+<p>迭代器封装了与复杂数据结构进行交互的细节， 为客户端提供多个访问集合元素的简单方法。 这种方式不仅对客户端来说非常方便， 而且能避免客户端在直接与集合交互时执行错误或有害的操作， 从而起到保护集合的作用。</p>
+</li>
+<li>
+<p>使用该模式可以减少程序中重复的遍历代码。</p>
+<p>重要迭代算法的代码往往体积非常庞大。 当这些代码被放置在程序业务逻辑中时， 它会让原始代码的职责模糊不清， 降低其可维护性。 因此， 将遍历代码移到特定的迭代器中可使程序代码更加精炼和简洁。</p>
+</li>
+<li>
+<p>如果你希望代码能够遍历不同的甚至是无法预知的数据结构， 可以使用迭代器模式。</p>
+<p>该模式为集合和迭代器提供了一些通用接口。 如果你在代码中使用了这些接口， 那么将其他实现了这些接口的集合和迭代器传递给它时， 它仍将可以正常运行。</p>
+</li>
+</ol>
+<h3><span id="die-dai-qi-de-shi-xian-fang-shi">迭代器的实现方式</span><a href="#die-dai-qi-de-shi-xian-fang-shi" class="header-anchor"> </a></h3>
+<ol>
+<li>
+<p>声明迭代器接口。该接口必须提供至少一个方法来获取容器的下一个元素。但是为了使用方便，可以添加一些其他方法。</p>
+<ol>
+<li>对于C++而言，标准库的迭代器通过重载了++操作符来获取下一个元素。</li>
+<li>对于Java而言，接口Iterator提供了next来获取下一个元素。</li>
+<li>对于Python而言，定义了__iter__()和__next__()方法的对象被视为iterator，通过__next__获取下一个元素。</li>
+</ol>
+</li>
+<li>
+<p>声明容器接口并且描述一个获取迭代器的方法。其返回值必须是迭代器接口。如果计划拥有多组不同的迭代器，可以声明多个类似的方法。</p>
+<ol>
+<li>对于C++而言，标准库的容器提供了begin(), end(), cbegin(), cend(), rbegin(), rend()来获取迭代器</li>
+<li>对于Java而言，接口Collection提供了iterator()方法获取迭代器。</li>
+<li>对于Python而言，iterator对象提供了__iter__()方法获取迭代器。</li>
+</ol>
+</li>
+<li>
+<p>为希望使用迭代器进行遍历的容器实现具体迭代器类。迭代器对象必须与单个容器实体链接。链接关系通常通过迭代器的构造函数建立。</p>
+</li>
+<li>
+<p>在你的容器类中实现容器接口。其主要思想是针对特定容器为客户端提供创建迭代器的快捷方式。容器对象必须将自身传递给迭代器的构造函数来创建两者之间的链接。</p>
+</li>
+<li>
+<p>检查客户端代码， 使用迭代器替代所有容器遍历代码。每当客户端需要遍历容器元素是都会获取一个新的迭代器。</p>
+</li>
+</ol>
+<h2><span id="rong-qi-kuang-jia">容器框架</span><a href="#rong-qi-kuang-jia" class="header-anchor"> </a></h2>
+<h3><span id="rong-qi-lei-xing-shang-de-cao-zuo">容器类型上的操作</span><a href="#rong-qi-lei-xing-shang-de-cao-zuo" class="header-anchor"> </a></h3>
+<p>容器类型上的操作形成了一种层次：</p>
+<ol>
+<li>某些操作时所有容器都提供的</li>
+<li>另外一些操作仅针对顺序容器、关联容器或无序容器</li>
+<li>还有一些操作只适用于一小部分容器</li>
+</ol>
+<h3><span id="c-stl-jia-gou-3">C++ STL架构<sup id="fnref:3"><a href="#fn:3" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="C++标准容器库 page73">[3]</span></a></sup></span><a href="#c-stl-jia-gou-3" class="header-anchor"> </a></h3>
+<p>C++ STL有六大组件：分配器、容器、迭代器、算法、仿函数、适配器</p>
+<p>C++ STL的基本观念是数据和操作分离。数据由容器加以管理，操作由可定制的算法定义，迭代器在两者之间充当粘合剂，使任何算法都可以和任何容器交互运作。容器数据存储的底层由分配器完成，迭代器了解容器的内部结构，可以访问容器的分配器，能够将“前进到下一个元素”的意图转换为合适的操作。</p>
+<p>从某种意义上来看，STL将数据和算法分开对待而不是合并考虑与面向对象程序设计最初思想矛盾，但是这么做由很重要的原因，容器和各种算法结合起来在很小的框架里拥有非常大的弹性。</p>
+<p>所有容器都提供的</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>类型别名</td>
+<td></td>
+</tr>
+<tr>
+<td>iterator</td>
+<td>此容器的迭代器类型</td>
+</tr>
+<tr>
+<td>const_iterator</td>
+<td>可以读取元素，但不能改变元素的迭代器类型</td>
+</tr>
+<tr>
+<td>size_type</td>
+<td>无符号整型，足够保存此种容器类型最大可能的大小</td>
+</tr>
+<tr>
+<td>difference_type</td>
+<td>带符号整型，足够保存两个迭代器之间的距离</td>
+</tr>
+<tr>
+<td>value_type</td>
+<td>元素类型</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>元素的左值类型,与value_type&amp;相同</td>
+</tr>
+<tr>
+<td>const_reference</td>
+<td>元素的const左值类型, 与const value_type&amp; 相同</td>
+</tr>
+<tr>
+<td>构造函数</td>
+<td></td>
+</tr>
+<tr>
+<td>C c</td>
+<td>默认构造函数, 构造空容器</td>
+</tr>
+<tr>
+<td>C c1(c2)</td>
+<td>拷贝构造容器</td>
+</tr>
+<tr>
+<td>C c(b, e)</td>
+<td>构造C， 将迭代器b和e指定范围内的元素拷贝到c</td>
+</tr>
+<tr>
+<td>C c(a, b, c, d, …)</td>
+<td>列表初始化</td>
+</tr>
+<tr>
+<td>赋值和swap</td>
+<td></td>
+</tr>
+<tr>
+<td>c1 = c2</td>
+<td>将从c1中的元素替换为c2中的元素</td>
+</tr>
+<tr>
+<td>c1 = {a, b, c, d, …}</td>
+<td>将c1替换为列表中元素</td>
+</tr>
+<tr>
+<td>a.swap(b)</td>
+<td>交换a和b的元素</td>
+</tr>
+<tr>
+<td>swap(a, b)</td>
+<td>交换a和b的元素</td>
+</tr>
+<tr>
+<td>大小</td>
+<td></td>
+</tr>
+<tr>
+<td>c.size()</td>
+<td>c中元素的数目</td>
+</tr>
+<tr>
+<td>c.max_szie()</td>
+<td>c中可以保存的最大元素数目</td>
+</tr>
+<tr>
+<td>c.empty()</td>
+<td>若c中存储了元素，返回false，否则返回true</td>
+</tr>
+<tr>
+<td>关系运算符</td>
+<td></td>
+</tr>
+<tr>
+<td>==, !=</td>
+<td>所有容器都支持</td>
+</tr>
+<tr>
+<td>&lt;, &lt;=, &gt;, &gt;=</td>
+<td>无序容器不支持</td>
+</tr>
+<tr>
+<td>获取迭代器</td>
+<td></td>
+</tr>
+<tr>
+<td>c.begin(), c.end()</td>
+<td>返回iterator</td>
+</tr>
+<tr>
+<td>c.cbegin(),c.cend()</td>
+<td>返回const_iterator</td>
+</tr>
+</tbody>
+</table>
+<p>C++采用模板来处理容器，STL对定义的通用容器分为两类：顺序容器、关联式容器。</p>
+<p>顺序容器(sequential container) 为程序员提供了控制元素存储和访问顺序的能力，这种顺序不依赖于元素的值，而是与元素加入容器时的位置相对应。<br>
+主要包括: vector、deques、list，也可以把string和array归入此类。</p>
+<p>关联容器</p>
+<h3><span id="java-ji-he-kuang-jia">Java 集合框架</span><a href="#java-ji-he-kuang-jia" class="header-anchor"> </a></h3>
+<h3><span id="python-shu-ju-mo-xing">Python 数据模型</span><a href="#python-shu-ju-mo-xing" class="header-anchor"> </a></h3>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">C++容器详解 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/sea520/p/12711554.html">传送门</a><a href="#fnref:1" rev="footnote"> ↩</a></span></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">2.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">迭代器模式 <a target="_blank" rel="noopener" href="https://refactoringguru.cn/design-patterns/iterator">传送门</a><a href="#fnref:2" rev="footnote"> ↩</a></span></li><li id="fn:3"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">3.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">C++标准容器库 page73<a href="#fnref:3" rev="footnote"> ↩</a></span></li></ol></div></div><link rel="stylesheet" href="/ChrisJaunes/css/spoiler.css" type="text/css"><script src="/ChrisJaunes/js/spoiler.js" type="text/javascript" async></script>
+        </div>
+        <div class="article-tags">
+            <ul class="tags-list cl">
+                <li><a href="/ChrisJaunes/tags/container/"><i class="fa fa-tag"></i>container</a></li>
+            </ul>
+        </div>
+        <div class="article-pagination cl">
+            <div class="pagination-prev">
+                <a href="/ChrisJaunes/2021/04/25/%E6%A0%87%E5%87%86%E5%BA%93-%E5%AE%B9%E5%99%A8%E6%B5%85%E6%9E%90-3-%E9%A1%BA%E5%BA%8F%E5%AE%B9%E5%99%A8-C++-vector/">上一篇：标准库-容器浅析-3-顺序容器-C++-vector</a>
+            </div>
+            <div class="pagination-next">
+                <a href="/ChrisJaunes/2021/04/17/python-%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0-%E6%95%B0%E5%AD%A6%E8%BF%90%E7%AE%97/">下一篇：python 内置函数 数学运算</a>
+            </div>
+        </div> 
+        
+            <link rel="stylesheet" href="https://unpkg.com/gitalk@latest/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
+<script src="https://priesttomb.github.io/js/md5.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    new Gitalk({
+        clientID: '0ba2ec4192b1d2fb9cb6',
+        clientSecret: '85deadc0e6ed5bdf825a822ab2fdfbad69401fb9',
+        repo: 'ChrisJaunes',
+        owner: 'ChrisJaunes',
+        admin: 'ChrisJaunes',
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    }).render('gitalk-container')
+</script>
+        
+    </div>
+
+</article>
+    </section>
+        
+<section class="tool-area">
+
+    <div class="toolbar">
+        
+
+        
+        <div class="widget-post widget" style="order: 1 ">
+            <h2 class="widget-title"><i class="fa fa-file-text"></i> Recent articles</h2>
+            <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/08/02/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95-mock%E6%B5%85%E6%9E%90-1-%E6%A6%82%E8%BF%B0/">单元测试-mock浅析-1-概述</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/07/07/Adfuller-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Adfuller-学习笔记</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/26/ZooKeeper-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E7%9B%B8%E5%85%B3/">ZooKeeper-源码浅析-数据模型相关</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/25/ZooKeeper-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B/">ZooKeeper-数据模型</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/25/ZooKeeper-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">ZooKeeper-环境搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/02/D3-Format-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90/">D3-Format-源码浅析</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/02/01/Skulpt-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-Parser/">Skulpt-源码浅析-Parser</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/01/24/Presto-SqlParser-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-AstBuilder%E7%B1%BB/">Presto-SqlParser-源码浅析-AstBuilder类</a></li></ul>
+        </div>
+        
+
+        
+        <div class="widget-tags widget" style="order: 2 ">
+            <h2 class="widget-title"><i class="fa fa-tags"></i> Tag</h2>
+            <a href="/ChrisJaunes/tags/Blockly/" style="font-size: 15px;">Blockly</a> <a href="/ChrisJaunes/tags/C/" style="font-size: 15px;">C++</a> <a href="/ChrisJaunes/tags/D3/" style="font-size: 10px;">D3</a> <a href="/ChrisJaunes/tags/Http/" style="font-size: 17.5px;">Http</a> <a href="/ChrisJaunes/tags/HttpServer/" style="font-size: 17.5px;">HttpServer</a> <a href="/ChrisJaunes/tags/Java/" style="font-size: 20px;">Java</a> <a href="/ChrisJaunes/tags/Jupyter/" style="font-size: 12.5px;">Jupyter</a> <a href="/ChrisJaunes/tags/Linux/" style="font-size: 10px;">Linux</a> <a href="/ChrisJaunes/tags/Net/" style="font-size: 12.5px;">Net</a> <a href="/ChrisJaunes/tags/Presto/" style="font-size: 12.5px;">Presto</a> <a href="/ChrisJaunes/tags/Python/" style="font-size: 17.5px;">Python</a> <a href="/ChrisJaunes/tags/Servlet/" style="font-size: 12.5px;">Servlet</a> <a href="/ChrisJaunes/tags/Skulpt/" style="font-size: 10px;">Skulpt</a> <a href="/ChrisJaunes/tags/Sql%E8%A7%A3%E6%9E%90/" style="font-size: 12.5px;">Sql解析</a> <a href="/ChrisJaunes/tags/TensorFlow/" style="font-size: 10px;">TensorFlow</a> <a href="/ChrisJaunes/tags/ZooKeeper/" style="font-size: 15px;">ZooKeeper</a> <a href="/ChrisJaunes/tags/container/" style="font-size: 10px;">container</a> <a href="/ChrisJaunes/tags/metakernel/" style="font-size: 10px;">metakernel</a> <a href="/ChrisJaunes/tags/python/" style="font-size: 10px;">python</a> <a href="/ChrisJaunes/tags/web/" style="font-size: 10px;">web</a> <a href="/ChrisJaunes/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 15px;">分布式</a> <a href="/ChrisJaunes/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size: 10px;">单元测试</a> <a href="/ChrisJaunes/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90/" style="font-size: 10px;">时间序列分析</a>
+        </div>
+        
+
+        
+            <div class="widget-categories widget" style="order: 3 ">
+                <h2 class="widget-title"><i class="fa fa-folder-open"></i> Categories</h2>
+                 <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Blockly/">Blockly</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Blockly/BlocklyJupyter/">BlocklyJupyter</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/C/">C++</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/C/%E6%A0%87%E5%87%86%E5%BA%93/">标准库</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/D3/">D3</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/">Java</a><span class="category-list-count">6</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Http/">Http</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Http/HttpServer/">HttpServer</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Servlet/">Servlet</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Presto/">Presto</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Presto/SqlParser/">SqlParser</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/">Python</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Docx/">Docx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Json/">Json</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0/">内置函数</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Skulpt/">Skulpt</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TensorFlow/">TensorFlow</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TensorFlow/env/">env</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/programing-language/">programing_language</a><span class="category-list-count">6</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/programing-language/%E6%AF%94%E8%BE%83%E5%AD%A6%E4%B9%A0/">比较学习</a><span class="category-list-count">6</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a><span class="category-list-count">3</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%88%86%E5%B8%83%E5%BC%8F/ZooKeeper/">ZooKeeper</a><span class="category-list-count">3</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">单元测试</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90/">时间序列分析</a><span class="category-list-count">1</span></li></ul> 
+            </div>         
+        
+    </div>
+</section>
+</div>
+
+
+<footer class="footer">
+	<p class="footer-intro">
+		
+		@2022 ChrisJaunes.
+	</p>
+	<p class="footer-intro">
+			Powered By <a href="https://github.com/ChrisJaunes" target="_blank"> ChrisJaunes </a> |
+			Hexo Powered By <a href="https://hexo.io/zh-cn/" target="_blank">hexo</a> |
+			Theme Powered by ChrisJaunes 
+	</p>
+	<p class="footer-intro">
+		<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+		<span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次 &nbsp;|&nbsp;</span>
+		<span id="busuanzi_container_site_uv">访客数<span id="busuanzi_value_site_uv"></span>人次&nbsp;|&nbsp;</span>
+		<span id="busuanzi_container_page_pv">本文总阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+	</p>
+</footer>
+
+
+
+
+<div class="extend-tools" id="extend-tools" style="display: none;">
+    <ul>
+        <li class="tools-returnTop" title="Back to top"><i class="fa fa-angle-double-up"></i></li>
+    </ul>
+</div>
+
+	</div>
+
+
+<script src="/ChrisJaunes/js/org/jquery.min.js"></script>
+
+
+<script src="/ChrisJaunes/js/extend.js"></script>
+
+</body>
+</html>

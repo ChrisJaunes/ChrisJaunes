@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="description" content="欢迎来的ChrisJaunes的世界">
+	<meta name="keywords" content="chrisjaunes">
+	<title>D3-Format-源码浅析 - ChrisJaunes</title>
+	
+	<link rel="shortcut icon" href="/ChrisJaunes/imgs/avatar.jpg"/>
+	
+<link rel="stylesheet" href="/ChrisJaunes/css/style.css">
+
+	
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+<body>
+	<div class="main-con">
+<nav class="nav cl">
+    <ul class="cl nav-list">
+        <li>
+            <a href="/ChrisJaunes/" class="">
+                <i class="fa fa-home"></i> 
+                <span>主页</span>
+            </a>
+        </li>
+        <li>
+            <a href="/ChrisJaunes/archives/" class="">
+                <i class=" fa-"></i> 
+                <span>归档</span>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" class="">
+                <i class=" fa-"></i> 
+                <span>关于</span>
+                <span class="drop-flag fa fa-angle-down"></span>
+            </a>
+            <dl>
+                <li>
+                    <a href="/ChrisJaunes/about" class="">
+                    <i class=" fa-"></i>
+                    <span>关于本站</span>
+                    </a>
+                </li>
+            </dl>
+        </li>
+    </ul>
+    <ul class="cl nav-tool">
+        <li>
+            <a target="_blank" rel="noopener" href="https://github.com/ChrisJaunes">
+                <i class="fa fa-github"></i>
+            </a>
+        </li>
+        <li>
+            <a href="mailto:judgehuang@tencent.com">
+                <i class="fa fa-envelope"></i>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" class="nav-search-btn">
+                <i class="fa fa-search"></i>
+            </a>
+        </li>
+    </ul>
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="nav-search"><input type="search" name="q" class="nav-search-input" placeholder="search..."><input type="hidden" name="sitesearch" value="https://chrisjaunes.github.io"></form>
+</nav>
+
+        
+<div class="con-wrap fadeToTop">
+    <section class="article-area">
+        
+<article class="article">
+    <div class="article-wrap">
+        <h2 class="article-title cl">
+            <a href="/ChrisJaunes/2022/04/02/D3-Format-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90/" title="D3-Format-源码浅析">
+                D3-Format-源码浅析
+            </a>
+        </h2>
+        <ul class="article-extra" style="margin-bottom: 20px">
+            <li class="article-time">
+                2022-04-02
+            </li> 
+            <li class="article-category">
+                <ol class="category-list cl">
+                    <i class="fa fa-folder-o"></i>
+                        <li><a href="/categories/D3/">D3</a></li>
+                </ol>
+            </li>
+        </ul>
+        <div class="article-description">
+            <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>考虑到 JavaScript 有时候不会以我们期望的方式显示数字，我们需要一些格式化工具，比如 d3-format</p>
+<p>D3-Format 官网例子:</p>
+<blockquote>
+<p>d3.format(“.0%”)(0.123);  // rounded percentage, “12%”<br>
+d3.format(“($.2f”)(-3.5); // localized fixed-point currency, “(£3.50)”<br>
+d3.format(“+20”)(42);     // space-filled and signed, &quot;                 +42&quot;<br>
+d3.format(“.^20”)(42);    // dot-filled and centered, “…42…”<br>
+d3.format(“.2s”)(42e6);   // SI-prefix with two significant digits, “42M”<br>
+d3.format(“#x”)(48879);   // prefixed lowercase hexadecimal, “0xbeef”<br>
+d3.format(“,.2r”)(4223);  // grouped thousands with two significant digits, “4,200”</p>
+</blockquote>
+<h2><span id="formatspecifier">formatSpecifier</span><a href="#formatspecifier" class="header-anchor"> </a></h2>
+<p>d3-format 采用了和 python3’s format 一样的 <a target="_blank" rel="noopener" href="https://docs.python.org/3/library/string.html#format-specification-mini-language">specification mini-language</a></p>
+<p>不过 python3 的 Format Specification Mini-Language 的 语法格式为:</p>
+<blockquote>
+<p>[[fill]align][sign][#][0][width][grouping_option][.precision][type]</p>
+</blockquote>
+<p>而 D3 对其做出了一些改动：</p>
+<blockquote>
+<p>[[fill]align][sign][symbol][0][width][,][.precision][~][type]</p>
+</blockquote>
+<p>在 sign 中 增加了 \ 和 ( 两个字符</p>
+<p>没有 #, 取而代之的是 symbol，等价于 增加了 $ 符号</p>
+<p>没有 grouping_option， 取而代之的是 , 符号， 等价于 去除了 _ 符号</p>
+<p>增加了一个 ~ 符号</p>
+<p>完整 正则表达式 如下：</p>
+<blockquote>
+<p>^(?:(.)?([&lt;&gt;=^]))?([+\-( ])?([$#])?(0)?(\d+)?(,)?(\.\d+)?(~)?([a-z%])?$</p>
+</blockquote>
+<p>注：i 代表不区分大小写</p>
+<p>D3 中 FormatSpecifier 负责解析所需格式</p>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        formatSpecifier 实现相关源码
+    </div>
+    <div class="spoiler-content">
+        <pre><code class="hljs javascript"><span class="hljs-comment">// [[fill]align][sign][symbol][0][width][,][.precision][~][type]</span>
+<span class="hljs-keyword">var</span> re = <span class="hljs-regexp">/^(?:(.)?([&lt;&gt;=^]))?([+\-( ])?([$#])?(0)?(\d+)?(,)?(\.\d+)?(~)?([a-z%])?$/i</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">formatSpecifier</span>(<span class="hljs-params">specifier</span>) </span>&#123;
+  <span class="hljs-keyword">if</span> (!(match = re.exec(specifier))) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">&quot;invalid format: &quot;</span> + specifier);
+  <span class="hljs-keyword">var</span> match;
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> FormatSpecifier(&#123;
+    fill: match[<span class="hljs-number">1</span>],
+    align: match[<span class="hljs-number">2</span>],
+    sign: match[<span class="hljs-number">3</span>],
+    symbol: match[<span class="hljs-number">4</span>],
+    zero: match[<span class="hljs-number">5</span>],
+    width: match[<span class="hljs-number">6</span>],
+    comma: match[<span class="hljs-number">7</span>],
+    precision: match[<span class="hljs-number">8</span>] &amp;&amp; match[<span class="hljs-number">8</span>].slice(<span class="hljs-number">1</span>),
+    trim: match[<span class="hljs-number">9</span>],
+    type: match[<span class="hljs-number">10</span>]
+  &#125;);
+&#125;
+
+formatSpecifier.prototype = FormatSpecifier.prototype; <span class="hljs-comment">// instanceof</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">FormatSpecifier</span>(<span class="hljs-params">specifier</span>) </span>&#123;
+  <span class="hljs-built_in">this</span>.fill = specifier.fill === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot; &quot;</span> : specifier.fill + <span class="hljs-string">&quot;&quot;</span>;
+  <span class="hljs-built_in">this</span>.align = specifier.align === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot;&gt;&quot;</span> : specifier.align + <span class="hljs-string">&quot;&quot;</span>;
+  <span class="hljs-built_in">this</span>.sign = specifier.sign === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot;-&quot;</span> : specifier.sign + <span class="hljs-string">&quot;&quot;</span>;
+  <span class="hljs-built_in">this</span>.symbol = specifier.symbol === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot;&quot;</span> : specifier.symbol + <span class="hljs-string">&quot;&quot;</span>;
+  <span class="hljs-built_in">this</span>.zero = !!specifier.zero;
+  <span class="hljs-built_in">this</span>.width = specifier.width === <span class="hljs-literal">undefined</span> ? <span class="hljs-literal">undefined</span> : +specifier.width;
+  <span class="hljs-built_in">this</span>.comma = !!specifier.comma;
+  <span class="hljs-built_in">this</span>.precision = specifier.precision === <span class="hljs-literal">undefined</span> ? <span class="hljs-literal">undefined</span> : +specifier.precision;
+  <span class="hljs-built_in">this</span>.trim = !!specifier.trim;
+  <span class="hljs-built_in">this</span>.type = specifier.type === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot;&quot;</span> : specifier.type + <span class="hljs-string">&quot;&quot;</span>;
+&#125;
+
+FormatSpecifier.prototype.toString = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">this</span>.fill
+      + <span class="hljs-built_in">this</span>.align
+      + <span class="hljs-built_in">this</span>.sign
+      + <span class="hljs-built_in">this</span>.symbol
+      + (<span class="hljs-built_in">this</span>.zero ? <span class="hljs-string">&quot;0&quot;</span> : <span class="hljs-string">&quot;&quot;</span>)
+      + (<span class="hljs-built_in">this</span>.width === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot;&quot;</span> : <span class="hljs-built_in">Math</span>.max(<span class="hljs-number">1</span>, <span class="hljs-built_in">this</span>.width | <span class="hljs-number">0</span>))
+      + (<span class="hljs-built_in">this</span>.comma ? <span class="hljs-string">&quot;,&quot;</span> : <span class="hljs-string">&quot;&quot;</span>)
+      + (<span class="hljs-built_in">this</span>.precision === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot;&quot;</span> : <span class="hljs-string">&quot;.&quot;</span> + <span class="hljs-built_in">Math</span>.max(<span class="hljs-number">0</span>, <span class="hljs-built_in">this</span>.precision | <span class="hljs-number">0</span>))
+      + (<span class="hljs-built_in">this</span>.trim ? <span class="hljs-string">&quot;~&quot;</span> : <span class="hljs-string">&quot;&quot;</span>)
+      + <span class="hljs-built_in">this</span>.type;
+&#125;;</code></pre>
+    </div>
+</div>
+<h2><span id="formattypes">formatTypes</span><a href="#formattypes" class="header-anchor"> </a></h2>
+<p>在知道了类型以后，由 formatTypes 进行类型处理</p>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        formatTypes 实现相关源码
+    </div>
+    <div class="spoiler-content">
+        <pre><code class="hljs javascript"><span class="hljs-keyword">import</span> formatDecimal <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./formatDecimal.js&quot;</span>;
+<span class="hljs-keyword">import</span> formatPrefixAuto <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./formatPrefixAuto.js&quot;</span>;
+<span class="hljs-keyword">import</span> formatRounded <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./formatRounded.js&quot;</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> &#123;
+  <span class="hljs-string">&quot;%&quot;</span>: <span class="hljs-function">(<span class="hljs-params">x, p</span>) =&gt;</span> (x * <span class="hljs-number">100</span>).toFixed(p),
+  <span class="hljs-string">&quot;b&quot;</span>: <span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> <span class="hljs-built_in">Math</span>.round(x).toString(<span class="hljs-number">2</span>),
+  <span class="hljs-string">&quot;c&quot;</span>: <span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> x + <span class="hljs-string">&quot;&quot;</span>,
+  <span class="hljs-string">&quot;d&quot;</span>: formatDecimal,
+  <span class="hljs-string">&quot;e&quot;</span>: <span class="hljs-function">(<span class="hljs-params">x, p</span>) =&gt;</span> x.toExponential(p),
+  <span class="hljs-string">&quot;f&quot;</span>: <span class="hljs-function">(<span class="hljs-params">x, p</span>) =&gt;</span> x.toFixed(p),
+  <span class="hljs-string">&quot;g&quot;</span>: <span class="hljs-function">(<span class="hljs-params">x, p</span>) =&gt;</span> x.toPrecision(p),
+  <span class="hljs-string">&quot;o&quot;</span>: <span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> <span class="hljs-built_in">Math</span>.round(x).toString(<span class="hljs-number">8</span>),
+  <span class="hljs-string">&quot;p&quot;</span>: <span class="hljs-function">(<span class="hljs-params">x, p</span>) =&gt;</span> formatRounded(x * <span class="hljs-number">100</span>, p),
+  <span class="hljs-string">&quot;r&quot;</span>: formatRounded,
+  <span class="hljs-string">&quot;s&quot;</span>: formatPrefixAuto,
+  <span class="hljs-string">&quot;X&quot;</span>: <span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> <span class="hljs-built_in">Math</span>.round(x).toString(<span class="hljs-number">16</span>).toUpperCase(),
+  <span class="hljs-string">&quot;x&quot;</span>: <span class="hljs-function">(<span class="hljs-params">x</span>) =&gt;</span> <span class="hljs-built_in">Math</span>.round(x).toString(<span class="hljs-number">16</span>)
+&#125;;
+</code></pre>
+    </div>
+</div>
+<h2><span id="locale">locale</span><a href="#locale" class="header-anchor"> </a></h2>
+<p>local 采用了默认导出的方式 导出了一个默认函数， 该函数是一个闭包，返回 函数newFormat 和 函数formatPrefix</p>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        locale 实现相关源码
+    </div>
+    <div class="spoiler-content">
+        <pre><code class="hljs javascript"><span class="hljs-keyword">import</span> exponent <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./exponent.js&quot;</span>;
+<span class="hljs-keyword">import</span> formatGroup <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./formatGroup.js&quot;</span>;
+<span class="hljs-keyword">import</span> formatNumerals <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./formatNumerals.js&quot;</span>;
+<span class="hljs-keyword">import</span> formatSpecifier <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./formatSpecifier.js&quot;</span>;
+<span class="hljs-keyword">import</span> formatTrim <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./formatTrim.js&quot;</span>;
+<span class="hljs-keyword">import</span> formatTypes <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./formatTypes.js&quot;</span>;
+<span class="hljs-keyword">import</span> &#123;prefixExponent&#125; <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./formatPrefixAuto.js&quot;</span>;
+<span class="hljs-keyword">import</span> identity <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./identity.js&quot;</span>;
+
+<span class="hljs-keyword">var</span> map = <span class="hljs-built_in">Array</span>.prototype.map,
+    prefixes = [<span class="hljs-string">&quot;y&quot;</span>,<span class="hljs-string">&quot;z&quot;</span>,<span class="hljs-string">&quot;a&quot;</span>,<span class="hljs-string">&quot;f&quot;</span>,<span class="hljs-string">&quot;p&quot;</span>,<span class="hljs-string">&quot;n&quot;</span>,<span class="hljs-string">&quot;µ&quot;</span>,<span class="hljs-string">&quot;m&quot;</span>,<span class="hljs-string">&quot;&quot;</span>,<span class="hljs-string">&quot;k&quot;</span>,<span class="hljs-string">&quot;M&quot;</span>,<span class="hljs-string">&quot;G&quot;</span>,<span class="hljs-string">&quot;T&quot;</span>,<span class="hljs-string">&quot;P&quot;</span>,<span class="hljs-string">&quot;E&quot;</span>,<span class="hljs-string">&quot;Z&quot;</span>,<span class="hljs-string">&quot;Y&quot;</span>];
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">locale</span>) </span>&#123;
+  <span class="hljs-keyword">var</span> group = locale.grouping === <span class="hljs-literal">undefined</span> || locale.thousands === <span class="hljs-literal">undefined</span> ? identity : formatGroup(map.call(locale.grouping, <span class="hljs-built_in">Number</span>), locale.thousands + <span class="hljs-string">&quot;&quot;</span>),
+      currencyPrefix = locale.currency === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot;&quot;</span> : locale.currency[<span class="hljs-number">0</span>] + <span class="hljs-string">&quot;&quot;</span>,
+      currencySuffix = locale.currency === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot;&quot;</span> : locale.currency[<span class="hljs-number">1</span>] + <span class="hljs-string">&quot;&quot;</span>,
+      decimal = locale.decimal === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot;.&quot;</span> : locale.decimal + <span class="hljs-string">&quot;&quot;</span>,
+      numerals = locale.numerals === <span class="hljs-literal">undefined</span> ? identity : formatNumerals(map.call(locale.numerals, <span class="hljs-built_in">String</span>)),
+      percent = locale.percent === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot;%&quot;</span> : locale.percent + <span class="hljs-string">&quot;&quot;</span>,
+      minus = locale.minus === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot;−&quot;</span> : locale.minus + <span class="hljs-string">&quot;&quot;</span>,
+      nan = locale.nan === <span class="hljs-literal">undefined</span> ? <span class="hljs-string">&quot;NaN&quot;</span> : locale.nan + <span class="hljs-string">&quot;&quot;</span>;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">newFormat</span>(<span class="hljs-params">specifier</span>) </span>&#123;...&#125;
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">formatPrefix</span>(<span class="hljs-params">specifier, value</span>) </span>&#123;
+    <span class="hljs-keyword">var</span> f = newFormat((specifier = formatSpecifier(specifier), specifier.type = <span class="hljs-string">&quot;f&quot;</span>, specifier)),
+        e = <span class="hljs-built_in">Math</span>.max(-<span class="hljs-number">8</span>, <span class="hljs-built_in">Math</span>.min(<span class="hljs-number">8</span>, <span class="hljs-built_in">Math</span>.floor(exponent(value) / <span class="hljs-number">3</span>))) * <span class="hljs-number">3</span>,
+        k = <span class="hljs-built_in">Math</span>.pow(<span class="hljs-number">10</span>, -e),
+        prefix = prefixes[<span class="hljs-number">8</span> + e / <span class="hljs-number">3</span>];
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>&#123;
+      <span class="hljs-keyword">return</span> f(k * value) + prefix;
+    &#125;;
+  &#125;
+
+  <span class="hljs-keyword">return</span> &#123;
+    format: newFormat,
+    formatPrefix: formatPrefix
+  &#125;;
+&#125;
+</code></pre>
+    </div>
+</div>
+<p>函数newFormat 也是个闭包， 对specifier进行处理， 返回了一个函数format</p>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        newFormat 实现相关源码
+    </div>
+    <div class="spoiler-content">
+        <pre><code class="hljs javascript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">locale</span>) </span>&#123;
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">newFormat</span>(<span class="hljs-params">specifier</span>) </span>&#123;
+    specifier = formatSpecifier(specifier);
+
+    <span class="hljs-keyword">var</span> fill = specifier.fill,
+        align = specifier.align,
+        sign = specifier.sign,
+        symbol = specifier.symbol,
+        zero = specifier.zero,
+        width = specifier.width,
+        comma = specifier.comma,
+        precision = specifier.precision,
+        trim = specifier.trim,
+        type = specifier.type;
+
+    <span class="hljs-comment">// The &quot;n&quot; type is an alias for &quot;,g&quot;.</span>
+    <span class="hljs-keyword">if</span> (type === <span class="hljs-string">&quot;n&quot;</span>) comma = <span class="hljs-literal">true</span>, type = <span class="hljs-string">&quot;g&quot;</span>;
+
+    <span class="hljs-comment">// The &quot;&quot; type, and any invalid type, is an alias for &quot;.12~g&quot;.</span>
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!formatTypes[type]) precision === <span class="hljs-literal">undefined</span> &amp;&amp; (precision = <span class="hljs-number">12</span>), trim = <span class="hljs-literal">true</span>, type = <span class="hljs-string">&quot;g&quot;</span>;
+
+    <span class="hljs-comment">// If zero fill is specified, padding goes after sign and before digits.</span>
+    <span class="hljs-keyword">if</span> (zero || (fill === <span class="hljs-string">&quot;0&quot;</span> &amp;&amp; align === <span class="hljs-string">&quot;=&quot;</span>)) zero = <span class="hljs-literal">true</span>, fill = <span class="hljs-string">&quot;0&quot;</span>, align = <span class="hljs-string">&quot;=&quot;</span>;
+
+    <span class="hljs-comment">// Compute the prefix and suffix.</span>
+    <span class="hljs-comment">// For SI-prefix, the suffix is lazily computed.</span>
+    <span class="hljs-keyword">var</span> prefix = symbol === <span class="hljs-string">&quot;$&quot;</span> ? currencyPrefix : symbol === <span class="hljs-string">&quot;#&quot;</span> &amp;&amp; <span class="hljs-regexp">/[boxX]/</span>.test(type) ? <span class="hljs-string">&quot;0&quot;</span> + type.toLowerCase() : <span class="hljs-string">&quot;&quot;</span>,
+        suffix = symbol === <span class="hljs-string">&quot;$&quot;</span> ? currencySuffix : <span class="hljs-regexp">/[%p]/</span>.test(type) ? percent : <span class="hljs-string">&quot;&quot;</span>;
+
+    <span class="hljs-comment">// What format function should we use?</span>
+    <span class="hljs-comment">// Is this an integer type?</span>
+    <span class="hljs-comment">// Can this type generate exponential notation?</span>
+    <span class="hljs-keyword">var</span> formatType = formatTypes[type],
+        maybeSuffix = <span class="hljs-regexp">/[defgprs%]/</span>.test(type);
+
+    <span class="hljs-comment">// Set the default precision if not specified,</span>
+    <span class="hljs-comment">// or clamp the specified precision to the supported range.</span>
+    <span class="hljs-comment">// For significant precision, it must be in [1, 21].</span>
+    <span class="hljs-comment">// For fixed precision, it must be in [0, 20].</span>
+    precision = precision === <span class="hljs-literal">undefined</span> ? <span class="hljs-number">6</span>
+        : <span class="hljs-regexp">/[gprs]/</span>.test(type) ? <span class="hljs-built_in">Math</span>.max(<span class="hljs-number">1</span>, <span class="hljs-built_in">Math</span>.min(<span class="hljs-number">21</span>, precision))
+        : <span class="hljs-built_in">Math</span>.max(<span class="hljs-number">0</span>, <span class="hljs-built_in">Math</span>.min(<span class="hljs-number">20</span>, precision));
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">format</span>(<span class="hljs-params">value</span>) </span>&#123; ... &#125;
+
+    <span class="hljs-keyword">return</span> format;
+  &#125;
+  ...
+&#125;</code></pre>
+    </div>
+</div>
+<p>在 format 中， 对value进行了格式化操作</p>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        format 实现相关源码
+    </div>
+    <div class="spoiler-content">
+        <pre><code class="hljs javascript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">locale</span>) </span>&#123;
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">newFormat</span>(<span class="hljs-params">specifier</span>) </span>&#123;
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">format</span>(<span class="hljs-params">value</span>) </span>&#123;
+      <span class="hljs-keyword">var</span> valuePrefix = prefix,
+          valueSuffix = suffix,
+          i, n, c;
+
+      <span class="hljs-keyword">if</span> (type === <span class="hljs-string">&quot;c&quot;</span>) &#123;
+        valueSuffix = formatType(value) + valueSuffix;
+        value = <span class="hljs-string">&quot;&quot;</span>;
+      &#125; <span class="hljs-keyword">else</span> &#123;
+        value = +value;
+
+        <span class="hljs-comment">// Determine the sign. -0 is not less than 0, but 1 / -0 is!</span>
+        <span class="hljs-keyword">var</span> valueNegative = value &lt; <span class="hljs-number">0</span> || <span class="hljs-number">1</span> / value &lt; <span class="hljs-number">0</span>;
+
+        <span class="hljs-comment">// Perform the initial formatting.</span>
+        value = <span class="hljs-built_in">isNaN</span>(value) ? nan : formatType(<span class="hljs-built_in">Math</span>.abs(value), precision);
+
+        <span class="hljs-comment">// Trim insignificant zeros.</span>
+        <span class="hljs-keyword">if</span> (trim) value = formatTrim(value);
+
+        <span class="hljs-comment">// If a negative value rounds to zero after formatting, and no explicit positive sign is requested, hide the sign.</span>
+        <span class="hljs-keyword">if</span> (valueNegative &amp;&amp; +value === <span class="hljs-number">0</span> &amp;&amp; sign !== <span class="hljs-string">&quot;+&quot;</span>) valueNegative = <span class="hljs-literal">false</span>;
+
+        <span class="hljs-comment">// Compute the prefix and suffix.</span>
+        valuePrefix = (valueNegative ? (sign === <span class="hljs-string">&quot;(&quot;</span> ? sign : minus) : sign === <span class="hljs-string">&quot;-&quot;</span> || sign === <span class="hljs-string">&quot;(&quot;</span> ? <span class="hljs-string">&quot;&quot;</span> : sign) + valuePrefix;
+        valueSuffix = (type === <span class="hljs-string">&quot;s&quot;</span> ? prefixes[<span class="hljs-number">8</span> + prefixExponent / <span class="hljs-number">3</span>] : <span class="hljs-string">&quot;&quot;</span>) + valueSuffix + (valueNegative &amp;&amp; sign === <span class="hljs-string">&quot;(&quot;</span> ? <span class="hljs-string">&quot;)&quot;</span> : <span class="hljs-string">&quot;&quot;</span>);
+
+        <span class="hljs-comment">// Break the formatted value into the integer “value” part that can be</span>
+        <span class="hljs-comment">// grouped, and fractional or exponential “suffix” part that is not.</span>
+        <span class="hljs-keyword">if</span> (maybeSuffix) &#123;
+          i = -<span class="hljs-number">1</span>, n = value.length;
+          <span class="hljs-keyword">while</span> (++i &lt; n) &#123;
+            <span class="hljs-keyword">if</span> (c = value.charCodeAt(i), <span class="hljs-number">48</span> &gt; c || c &gt; <span class="hljs-number">57</span>) &#123;
+              valueSuffix = (c === <span class="hljs-number">46</span> ? decimal + value.slice(i + <span class="hljs-number">1</span>) : value.slice(i)) + valueSuffix;
+              value = value.slice(<span class="hljs-number">0</span>, i);
+              <span class="hljs-keyword">break</span>;
+            &#125;
+          &#125;
+        &#125;
+      &#125;
+
+      <span class="hljs-comment">// If the fill character is not &quot;0&quot;, grouping is applied before padding.</span>
+      <span class="hljs-keyword">if</span> (comma &amp;&amp; !zero) value = group(value, <span class="hljs-literal">Infinity</span>);
+
+      <span class="hljs-comment">// Compute the padding.</span>
+      <span class="hljs-keyword">var</span> length = valuePrefix.length + value.length + valueSuffix.length,
+          padding = length &lt; width ? <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>(width - length + <span class="hljs-number">1</span>).join(fill) : <span class="hljs-string">&quot;&quot;</span>;
+
+      <span class="hljs-comment">// If the fill character is &quot;0&quot;, grouping is applied after padding.</span>
+      <span class="hljs-keyword">if</span> (comma &amp;&amp; zero) value = group(padding + value, padding.length ? width - valueSuffix.length : <span class="hljs-literal">Infinity</span>), padding = <span class="hljs-string">&quot;&quot;</span>;
+
+      <span class="hljs-comment">// Reconstruct the final output based on the desired alignment.</span>
+      <span class="hljs-keyword">switch</span> (align) &#123;
+        <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;&lt;&quot;</span>: value = valuePrefix + value + valueSuffix + padding; <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;=&quot;</span>: value = valuePrefix + padding + value + valueSuffix; <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;^&quot;</span>: value = padding.slice(<span class="hljs-number">0</span>, length = padding.length &gt;&gt; <span class="hljs-number">1</span>) + valuePrefix + value + valueSuffix + padding.slice(length); <span class="hljs-keyword">break</span>;
+        <span class="hljs-keyword">default</span>: value = padding + valuePrefix + value + valueSuffix; <span class="hljs-keyword">break</span>;
+      &#125;
+
+      <span class="hljs-keyword">return</span> numerals(value);
+    &#125;
+
+    format.toString = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>&#123;
+      <span class="hljs-keyword">return</span> specifier + <span class="hljs-string">&quot;&quot;</span>;
+    &#125;;
+    ...
+  &#125;
+&#125;</code></pre>
+    </div>
+</div>
+<h2><span id="defaultlocale">defaultLocale</span><a href="#defaultlocale" class="header-anchor"> </a></h2>
+<p>最后 将其暴露在d3空间中</p>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        defaultLocale 实现相关源码
+    </div>
+    <div class="spoiler-content">
+        <pre><code class="hljs javascript"><span class="hljs-keyword">import</span> formatLocale <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./locale.js&quot;</span>;
+
+<span class="hljs-keyword">var</span> locale;
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">var</span> format;
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">var</span> formatPrefix;
+
+defaultLocale(&#123;
+  thousands: <span class="hljs-string">&quot;,&quot;</span>,
+  grouping: [<span class="hljs-number">3</span>],
+  currency: [<span class="hljs-string">&quot;$&quot;</span>, <span class="hljs-string">&quot;&quot;</span>]
+&#125;);
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">defaultLocale</span>(<span class="hljs-params">definition</span>) </span>&#123;
+  locale = formatLocale(definition);
+  format = locale.format;
+  formatPrefix = locale.formatPrefix;
+  <span class="hljs-keyword">return</span> locale;
+&#125;</code></pre>
+    </div>
+</div>
+<link rel="stylesheet" href="/ChrisJaunes/css/spoiler.css" type="text/css"><script src="/ChrisJaunes/js/spoiler.js" type="text/javascript" async></script>
+        </div>
+        <div class="article-tags">
+            <ul class="tags-list cl">
+                <li><a href="/ChrisJaunes/tags/D3/"><i class="fa fa-tag"></i>D3</a></li>
+            </ul>
+        </div>
+        <div class="article-pagination cl">
+            <div class="pagination-prev">
+                <a href="/ChrisJaunes/2022/04/25/ZooKeeper-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">上一篇：ZooKeeper-环境搭建</a>
+            </div>
+            <div class="pagination-next">
+                <a href="/ChrisJaunes/2022/02/01/Skulpt-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-Parser/">下一篇：Skulpt-源码浅析-Parser</a>
+            </div>
+        </div> 
+        
+            <link rel="stylesheet" href="https://unpkg.com/gitalk@latest/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
+<script src="https://priesttomb.github.io/js/md5.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    new Gitalk({
+        clientID: '0ba2ec4192b1d2fb9cb6',
+        clientSecret: '85deadc0e6ed5bdf825a822ab2fdfbad69401fb9',
+        repo: 'ChrisJaunes',
+        owner: 'ChrisJaunes',
+        admin: 'ChrisJaunes',
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    }).render('gitalk-container')
+</script>
+        
+    </div>
+
+</article>
+    </section>
+        
+<section class="tool-area">
+
+    <div class="toolbar">
+        
+
+        
+        <div class="widget-post widget" style="order: 1 ">
+            <h2 class="widget-title"><i class="fa fa-file-text"></i> Recent articles</h2>
+            <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/08/02/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95-mock%E6%B5%85%E6%9E%90-1-%E6%A6%82%E8%BF%B0/">单元测试-mock浅析-1-概述</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/07/07/Adfuller-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Adfuller-学习笔记</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/26/ZooKeeper-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E7%9B%B8%E5%85%B3/">ZooKeeper-源码浅析-数据模型相关</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/25/ZooKeeper-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B/">ZooKeeper-数据模型</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/25/ZooKeeper-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">ZooKeeper-环境搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/02/D3-Format-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90/">D3-Format-源码浅析</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/02/01/Skulpt-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-Parser/">Skulpt-源码浅析-Parser</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/01/24/Presto-SqlParser-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-AstBuilder%E7%B1%BB/">Presto-SqlParser-源码浅析-AstBuilder类</a></li></ul>
+        </div>
+        
+
+        
+        <div class="widget-tags widget" style="order: 2 ">
+            <h2 class="widget-title"><i class="fa fa-tags"></i> Tag</h2>
+            <a href="/ChrisJaunes/tags/Blockly/" style="font-size: 15px;">Blockly</a> <a href="/ChrisJaunes/tags/C/" style="font-size: 15px;">C++</a> <a href="/ChrisJaunes/tags/D3/" style="font-size: 10px;">D3</a> <a href="/ChrisJaunes/tags/Http/" style="font-size: 17.5px;">Http</a> <a href="/ChrisJaunes/tags/HttpServer/" style="font-size: 17.5px;">HttpServer</a> <a href="/ChrisJaunes/tags/Java/" style="font-size: 20px;">Java</a> <a href="/ChrisJaunes/tags/Jupyter/" style="font-size: 12.5px;">Jupyter</a> <a href="/ChrisJaunes/tags/Linux/" style="font-size: 10px;">Linux</a> <a href="/ChrisJaunes/tags/Net/" style="font-size: 12.5px;">Net</a> <a href="/ChrisJaunes/tags/Presto/" style="font-size: 12.5px;">Presto</a> <a href="/ChrisJaunes/tags/Python/" style="font-size: 17.5px;">Python</a> <a href="/ChrisJaunes/tags/Servlet/" style="font-size: 12.5px;">Servlet</a> <a href="/ChrisJaunes/tags/Skulpt/" style="font-size: 10px;">Skulpt</a> <a href="/ChrisJaunes/tags/Sql%E8%A7%A3%E6%9E%90/" style="font-size: 12.5px;">Sql解析</a> <a href="/ChrisJaunes/tags/TensorFlow/" style="font-size: 10px;">TensorFlow</a> <a href="/ChrisJaunes/tags/ZooKeeper/" style="font-size: 15px;">ZooKeeper</a> <a href="/ChrisJaunes/tags/container/" style="font-size: 10px;">container</a> <a href="/ChrisJaunes/tags/metakernel/" style="font-size: 10px;">metakernel</a> <a href="/ChrisJaunes/tags/python/" style="font-size: 10px;">python</a> <a href="/ChrisJaunes/tags/web/" style="font-size: 10px;">web</a> <a href="/ChrisJaunes/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 15px;">分布式</a> <a href="/ChrisJaunes/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size: 10px;">单元测试</a> <a href="/ChrisJaunes/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90/" style="font-size: 10px;">时间序列分析</a>
+        </div>
+        
+
+        
+            <div class="widget-categories widget" style="order: 3 ">
+                <h2 class="widget-title"><i class="fa fa-folder-open"></i> Categories</h2>
+                 <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Blockly/">Blockly</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Blockly/BlocklyJupyter/">BlocklyJupyter</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/C/">C++</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/C/%E6%A0%87%E5%87%86%E5%BA%93/">标准库</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/D3/">D3</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/">Java</a><span class="category-list-count">6</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Http/">Http</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Http/HttpServer/">HttpServer</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Servlet/">Servlet</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Presto/">Presto</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Presto/SqlParser/">SqlParser</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/">Python</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Docx/">Docx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Json/">Json</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0/">内置函数</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Skulpt/">Skulpt</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TensorFlow/">TensorFlow</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TensorFlow/env/">env</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/programing-language/">programing_language</a><span class="category-list-count">6</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/programing-language/%E6%AF%94%E8%BE%83%E5%AD%A6%E4%B9%A0/">比较学习</a><span class="category-list-count">6</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a><span class="category-list-count">3</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%88%86%E5%B8%83%E5%BC%8F/ZooKeeper/">ZooKeeper</a><span class="category-list-count">3</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">单元测试</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90/">时间序列分析</a><span class="category-list-count">1</span></li></ul> 
+            </div>         
+        
+    </div>
+</section>
+</div>
+
+
+<footer class="footer">
+	<p class="footer-intro">
+		
+		@2022 ChrisJaunes.
+	</p>
+	<p class="footer-intro">
+			Powered By <a href="https://github.com/ChrisJaunes" target="_blank"> ChrisJaunes </a> |
+			Hexo Powered By <a href="https://hexo.io/zh-cn/" target="_blank">hexo</a> |
+			Theme Powered by ChrisJaunes 
+	</p>
+	<p class="footer-intro">
+		<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+		<span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次 &nbsp;|&nbsp;</span>
+		<span id="busuanzi_container_site_uv">访客数<span id="busuanzi_value_site_uv"></span>人次&nbsp;|&nbsp;</span>
+		<span id="busuanzi_container_page_pv">本文总阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+	</p>
+</footer>
+
+
+
+
+<div class="extend-tools" id="extend-tools" style="display: none;">
+    <ul>
+        <li class="tools-returnTop" title="Back to top"><i class="fa fa-angle-double-up"></i></li>
+    </ul>
+</div>
+
+	</div>
+
+
+<script src="/ChrisJaunes/js/org/jquery.min.js"></script>
+
+
+<script src="/ChrisJaunes/js/extend.js"></script>
+
+</body>
+</html>
