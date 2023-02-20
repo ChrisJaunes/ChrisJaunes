@@ -10,6 +10,7 @@
         owner: '<%= config.gitalk.owner %>',
         admin: '<%= config.gitalk.admin %>',
         id: md5(location.pathname),
-        distractionFreeMode: true
+        distractionFreeMode: true,
+        proxy: '<%= config.gitalk.proxy %>'
     }).render('gitalk-container')
 </script>

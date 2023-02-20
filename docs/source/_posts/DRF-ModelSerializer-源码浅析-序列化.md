@@ -231,3 +231,4 @@ class Serializer(BaseSerializer, metaclass=SerializerMetaclass):
 参考文档：
 
 1. Serializers.drf.https://www.django-rest-framework.org/api-guide/serializers/#serializers
+2. Django Rest Framework源码剖析(六)-----序列化(serializers).W_D.https://www.cnblogs.com/wdliu/p/9131500.html

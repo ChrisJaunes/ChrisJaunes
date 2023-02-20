@@ -129,6 +129,7 @@ gitalk:
   clientID: 0ba2ec4192b1d2fb9cb6
   clientSecret: 85deadc0e6ed5bdf825a822ab2fdfbad69401fb9
   distractionFreeMode: true
+  proxy: https://vercel.prohibitorum.top/github_access_token
 
 mathjax:
   tags: none # or 'ams' or 'all'
