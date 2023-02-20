@@ -1,5 +1,5 @@
 ﻿---
-title: python-mock-用法浅析
+title: python-mock-用法浅析-替换被测系统的某些部分
 date: 2023-02-20 20:28:40
 categories: [Python, Mock]
 tags: [Python, Mock, test]
