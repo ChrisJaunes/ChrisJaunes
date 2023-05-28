@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="description" content="欢迎来的ChrisJaunes的世界">
+	<meta name="keywords" content="chrisjaunes">
+	<title>TaskFlow-源码浅析-Executor类 - ChrisJaunes</title>
+	
+	<link rel="shortcut icon" href="/ChrisJaunes/imgs/avatar.jpg"/>
+	
+<link rel="stylesheet" href="/ChrisJaunes/css/style.css">
+
+	
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+<body>
+	<div class="main-con">
+<nav class="nav cl">
+    <ul class="cl nav-list">
+        <li>
+            <a href="/ChrisJaunes/" class="">
+                <i class="fa fa-home"></i> 
+                <span>主页</span>
+            </a>
+        </li>
+        <li>
+            <a href="/ChrisJaunes/archives/" class="">
+                <i class=" fa-"></i> 
+                <span>归档</span>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" class="">
+                <i class=" fa-"></i> 
+                <span>关于</span>
+                <span class="drop-flag fa fa-angle-down"></span>
+            </a>
+            <dl>
+                <li>
+                    <a href="/ChrisJaunes/about" class="">
+                    <i class=" fa-"></i>
+                    <span>关于本站</span>
+                    </a>
+                </li>
+            </dl>
+        </li>
+    </ul>
+    <ul class="cl nav-tool">
+        <li>
+            <a target="_blank" rel="noopener" href="https://github.com/ChrisJaunes">
+                <i class="fa fa-github"></i>
+            </a>
+        </li>
+        <li>
+            <a href="mailto:judgehuang@tencent.com">
+                <i class="fa fa-envelope"></i>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" class="nav-search-btn">
+                <i class="fa fa-search"></i>
+            </a>
+        </li>
+    </ul>
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="nav-search"><input type="search" name="q" class="nav-search-input" placeholder="search..."><input type="hidden" name="sitesearch" value="https://chrisjaunes.github.io"></form>
+</nav>
+
+        
+<div class="con-wrap fadeToTop">
+    <section class="article-area">
+        
+<article class="article">
+    <div class="article-wrap">
+        <h2 class="article-title cl">
+            <a href="/ChrisJaunes/2023/05/25/TaskFlow-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-Executor%E7%B1%BB/" title="TaskFlow-源码浅析-Executor类">
+                TaskFlow-源码浅析-Executor类
+            </a>
+        </h2>
+        <ul class="article-extra" style="margin-bottom: 20px">
+            <li class="article-time">
+                2023-05-25
+            </li> 
+            <li class="article-category">
+                <ol class="category-list cl">
+                    <i class="fa fa-folder-o"></i>
+                        <li><a href="/categories/TaskFlow/">TaskFlow</a></li>
+                </ol>
+            </li>
+        </ul>
+        <div class="article-description">
+            <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>类Executor是负责执行taskflow的类。</p>
+<h2><span id="gou-zao-han-shu">构造函数</span><a href="#gou-zao-han-shu" class="header-anchor"> </a></h2>
+<p>构造函数中创建了一个大小为N的线程池 _threads 和 大小为N的Worker队列 _workers，并在 _spawn 中初始化</p>
+<p>首先看线程池的部分，可以看到在 _spawn 中有一个for循环，初始化了使用 lambda表达式 去初始化了 _threads 中的每一个线程，所有线程在初始化后将开始运行</p>
+<p>其中 Worker&amp; w, std::mutex&amp; mutex, std::condition_variable&amp; cond, size_t&amp; n 都是引用，为了保证线程中正确使用，对应的实参使用了std::ref</p>
+<pre><code class="hljs cpp"><span class="hljs-keyword">inline</span> <span class="hljs-keyword">void</span> Executor::_spawn(<span class="hljs-keyword">size_t</span> N) &#123;
+    <span class="hljs-comment">// ...</span>
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">size_t</span> id=<span class="hljs-number">0</span>; id&lt;N; ++id) &#123;
+        <span class="hljs-comment">// ...</span>
+        _threads[id] = <span class="hljs-built_in">std</span>::thread([<span class="hljs-keyword">this</span>] (
+            Worker&amp; w, <span class="hljs-built_in">std</span>::mutex&amp; mutex, <span class="hljs-built_in">std</span>::condition_variable&amp; cond, <span class="hljs-keyword">size_t</span>&amp; n
+        ) -&gt; <span class="hljs-keyword">void</span> &#123;
+            <span class="hljs-comment">// ...</span>
+        &#125;, <span class="hljs-built_in">std</span>::ref(_workers[id]), <span class="hljs-built_in">std</span>::ref(mutex), <span class="hljs-built_in">std</span>::ref(cond), <span class="hljs-built_in">std</span>::ref(n));
+    &#125;
+    <span class="hljs-comment">// ...</span>
+&#125;</code></pre>
+<p>在该lambda开始部分，worker的_threads指针指向自身线程，接着设置线程ID到worker ID的映射。</p>
+<p>为了防止多线程读写_wids，mutex是主线程和_threads中所有线程共享的，对其上锁可以保证对_wids读写不会发生冲突。</p>
+<p>lock是块级变量，在std::scoped_lock lock(mutex)中 构造函数调用mutex.lock上锁，在块结束时析构函数调用mutex.unlock释放锁</p>
+<p>在主线程执行完for以后，将使用mutex构造unique_lock变量，使用condition_variable的wait函数堵塞主线程，wait被调用和会释放所在线程持有的 mutex 锁， 所以这里不会造成死锁</p>
+<p>_threads里的各个线程会对启动的线程计数，需要的N个线程都启动后，使用cond.notify_one唤醒因cond.wait堵塞的主线程，构造函数完成</p>
+<pre><code class="hljs cpp"><span class="hljs-keyword">inline</span> <span class="hljs-keyword">void</span> Executor::_spawn(<span class="hljs-keyword">size_t</span> N) &#123;
+    <span class="hljs-built_in">std</span>::mutex mutex;
+    <span class="hljs-built_in">std</span>::condition_variable cond;
+    <span class="hljs-keyword">size_t</span> n=<span class="hljs-number">0</span>;
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">size_t</span> id=<span class="hljs-number">0</span>; id&lt;N; ++id) &#123;
+        <span class="hljs-comment">// ...</span>
+        _threads[id] = <span class="hljs-built_in">std</span>::thread([<span class="hljs-keyword">this</span>] (
+            Worker&amp; w, <span class="hljs-built_in">std</span>::mutex&amp; mutex, <span class="hljs-built_in">std</span>::condition_variable&amp; cond, <span class="hljs-keyword">size_t</span>&amp; n
+        ) -&gt; <span class="hljs-keyword">void</span> &#123;
+            w._thread = &amp;_threads[w._id];
+            &#123;
+                <span class="hljs-built_in">std</span>::scoped_lock lock(mutex);
+                _wids[<span class="hljs-built_in">std</span>::this_thread::get_id()] = w._id;
+                <span class="hljs-keyword">if</span>(n++; n == num_workers()) &#123;
+                cond.notify_one();
+                &#125;
+            &#125;
+            <span class="hljs-comment">// ...</span>
+        &#125;, <span class="hljs-built_in">std</span>::ref(_workers[id]), <span class="hljs-built_in">std</span>::ref(mutex), <span class="hljs-built_in">std</span>::ref(cond), <span class="hljs-built_in">std</span>::ref(n));
+    &#125;
+    <span class="hljs-function"><span class="hljs-built_in">std</span>::unique_lock&lt;<span class="hljs-built_in">std</span>::mutex&gt; <span class="hljs-title">lock</span><span class="hljs-params">(mutex)</span></span>;
+    cond.wait(lock, [&amp;]()&#123; <span class="hljs-keyword">return</span> n==N; &#125;);
+&#125;</code></pre>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        Executor 初始化 实现相关源码
+    </div>
+    <div class="spoiler-content">
+        <p><a target="_blank" rel="noopener" href="https://github.com/taskflow/taskflow/blob/master/taskflow/core/executor.hpp#L1107-L1124">executor.hpp tf:Executor::Executor 实现</a><br>
+<a target="_blank" rel="noopener" href="https://github.com/taskflow/taskflow/blob/master/taskflow/core/executor.hpp#L1170-L1241">executor.hpp tf:Executor::_spawn 实现</a></p>
+<pre><code class="hljs cpp"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Executor</span> &#123;</span>
+    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;<span class="hljs-built_in">std</span>::thread&gt; _threads;
+    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">vector</span>&lt;Worker&gt; _workers
+&#125;
+<span class="hljs-comment">// Constructor</span>
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-title">Executor::Executor</span><span class="hljs-params">(<span class="hljs-keyword">size_t</span> N, <span class="hljs-built_in">std</span>::<span class="hljs-built_in">shared_ptr</span>&lt;WorkerInterface&gt; wix)</span> :</span>
+<span class="hljs-function">  _MAX_STEALS </span>&#123;((N+<span class="hljs-number">1</span>) &lt;&lt; <span class="hljs-number">1</span>)&#125;,
+  _threads    &#123;N&#125;,
+  _workers    &#123;N&#125;,
+  _notifier   &#123;N&#125;,
+  _worker_interface &#123;<span class="hljs-built_in">std</span>::move(wix)&#125; &#123;
+
+  <span class="hljs-keyword">if</span>(N == <span class="hljs-number">0</span>) &#123;
+    TF_THROW(<span class="hljs-string">&quot;no cpu workers to execute taskflows&quot;</span>);
+  &#125;
+
+  _spawn(N);
+
+  <span class="hljs-comment">// instantite the default observer if requested</span>
+  <span class="hljs-keyword">if</span>(has_env(TF_ENABLE_PROFILER)) &#123;
+    TFProfManager::get()._manage(make_observer&lt;TFProfObserver&gt;());
+  &#125;
+&#125;
+<span class="hljs-comment">// Procedure: _spawn</span>
+<span class="hljs-keyword">inline</span> <span class="hljs-keyword">void</span> Executor::_spawn(<span class="hljs-keyword">size_t</span> N) &#123;
+
+  <span class="hljs-built_in">std</span>::mutex mutex;
+  <span class="hljs-built_in">std</span>::condition_variable cond;
+  <span class="hljs-keyword">size_t</span> n=<span class="hljs-number">0</span>;
+
+  <span class="hljs-keyword">for</span>(<span class="hljs-keyword">size_t</span> id=<span class="hljs-number">0</span>; id&lt;N; ++id) &#123;
+
+    _workers[id]._id = id;
+    _workers[id]._vtm = id;
+    _workers[id]._executor = <span class="hljs-keyword">this</span>;
+    _workers[id]._waiter = &amp;_notifier._waiters[id];
+
+    _threads[id] = <span class="hljs-built_in">std</span>::thread([<span class="hljs-keyword">this</span>] (
+      Worker&amp; w, <span class="hljs-built_in">std</span>::mutex&amp; mutex, <span class="hljs-built_in">std</span>::condition_variable&amp; cond, <span class="hljs-keyword">size_t</span>&amp; n
+    ) -&gt; <span class="hljs-keyword">void</span> &#123;
+      
+      <span class="hljs-comment">// assign the thread</span>
+      w._thread = &amp;_threads[w._id];
+
+      <span class="hljs-comment">// enables the mapping</span>
+      &#123;
+        <span class="hljs-built_in">std</span>::scoped_lock lock(mutex);
+        _wids[<span class="hljs-built_in">std</span>::this_thread::get_id()] = w._id;
+        <span class="hljs-keyword">if</span>(n++; n == num_workers()) &#123;
+          cond.notify_one();
+        &#125;
+      &#125;
+
+      Node* t = <span class="hljs-literal">nullptr</span>;
+      
+      <span class="hljs-comment">// before entering the scheduler (work-stealing loop), </span>
+      <span class="hljs-comment">// call the user-specified prologue function</span>
+      <span class="hljs-keyword">if</span>(_worker_interface) &#123;
+        _worker_interface-&gt;scheduler_prologue(w);
+      &#125;
+      
+      <span class="hljs-comment">// must use 1 as condition instead of !done because</span>
+      <span class="hljs-comment">// the previous worker may stop while the following workers</span>
+      <span class="hljs-comment">// are still preparing for entering the scheduling loop</span>
+      <span class="hljs-built_in">std</span>::exception_ptr ptr&#123;<span class="hljs-literal">nullptr</span>&#125;;
+      <span class="hljs-keyword">try</span> &#123;
+        <span class="hljs-keyword">while</span>(<span class="hljs-number">1</span>) &#123;
+
+          <span class="hljs-comment">// execute the tasks.</span>
+          _exploit_task(w, t);
+
+          <span class="hljs-comment">// wait for tasks</span>
+          <span class="hljs-keyword">if</span>(_wait_for_task(w, t) == <span class="hljs-literal">false</span>) &#123;
+            <span class="hljs-keyword">break</span>;
+          &#125;
+        &#125;
+      &#125; 
+      <span class="hljs-keyword">catch</span>(...) &#123;
+        ptr = <span class="hljs-built_in">std</span>::current_exception();
+      &#125;
+      
+      <span class="hljs-comment">// call the user-specified epilogue function</span>
+      <span class="hljs-keyword">if</span>(_worker_interface) &#123;
+        _worker_interface-&gt;scheduler_epilogue(w, ptr);
+      &#125;
+
+    &#125;, <span class="hljs-built_in">std</span>::ref(_workers[id]), <span class="hljs-built_in">std</span>::ref(mutex), <span class="hljs-built_in">std</span>::ref(cond), <span class="hljs-built_in">std</span>::ref(n));
+    
+  &#125;
+
+  <span class="hljs-function"><span class="hljs-built_in">std</span>::unique_lock&lt;<span class="hljs-built_in">std</span>::mutex&gt; <span class="hljs-title">lock</span><span class="hljs-params">(mutex)</span></span>;
+  cond.wait(lock, [&amp;]()&#123; <span class="hljs-keyword">return</span> n==N; &#125;);
+&#125;</code></pre>
+    </div>
+</div>
+<h2><span id="xiao-fei-zhe">消费者</span><a href="#xiao-fei-zhe" class="header-anchor"> </a></h2>
+<p>thread 接受了一个lambda作为运行函数，处理了worker和threads中的映射后，剩下部分是一个死循环，不停的消费 worker 的 wsq 中的内容</p>
+<p>有趣的是，这里是先执行_exploit_task，再执行_wait_for_task，而不是相反的操作。</p>
+<p>这个死循环只有当 _wait_for_task 的返回值为false时才会结束；而 _wait_for_task 只有 _done 才会返回false；而 _done 只用在 Excutor被析构的时候才会置为true</p>
+<pre><code class="hljs cpp"><span class="hljs-keyword">inline</span> <span class="hljs-keyword">void</span> Executor::_spawn(<span class="hljs-keyword">size_t</span> N) &#123;
+    <span class="hljs-comment">//...</span>
+    _threads[id] = <span class="hljs-built_in">std</span>::thread([<span class="hljs-keyword">this</span>] (
+        Worker&amp; w, <span class="hljs-built_in">std</span>::mutex&amp; mutex, <span class="hljs-built_in">std</span>::condition_variable&amp; cond, <span class="hljs-keyword">size_t</span>&amp; n
+    ) -&gt; <span class="hljs-keyword">void</span> &#123;
+        <span class="hljs-comment">// ...</span>
+        <span class="hljs-keyword">while</span>(<span class="hljs-number">1</span>) &#123;
+          <span class="hljs-comment">// execute the tasks.</span>
+          _exploit_task(w, t);
+          <span class="hljs-comment">// wait for tasks</span>
+          <span class="hljs-keyword">if</span>(_wait_for_task(w, t) == <span class="hljs-literal">false</span>) &#123;
+            <span class="hljs-keyword">break</span>;
+          &#125;
+        &#125;
+    &#125;, <span class="hljs-built_in">std</span>::ref(_workers[id]), <span class="hljs-built_in">std</span>::ref(mutex), <span class="hljs-built_in">std</span>::ref(cond), <span class="hljs-built_in">std</span>::ref(n));
+    <span class="hljs-comment">// ...</span>
+&#125;</code></pre>
+<h3><span id="exploit-task">_exploit_task</span><a href="#exploit-task" class="header-anchor"> </a></h3>
+<p>其中, _exploit_task 对获取的任务(实际是Node*), 交由 _invoke 处理，然后从worker的TaskQueue中获取下一个</p>
+<p>_invoke 在执行完 Node 后，会把新的可以执行 Node 放入当前 worker 的 _wsq</p>
+<pre><code class="hljs cpp"><span class="hljs-comment">// Procedure: _exploit_task</span>
+<span class="hljs-keyword">inline</span> <span class="hljs-keyword">void</span> Executor::_exploit_task(Worker&amp; w, Node*&amp; t) &#123;
+  <span class="hljs-keyword">while</span>(t) &#123;
+    _invoke(w, t);
+    t = w._wsq.pop();
+  &#125;
+&#125;</code></pre>
+<h3><span id="wait-for-task">_wait_for_task</span><a href="#wait-for-task" class="header-anchor"> </a></h3>
+<p>在工作队列为空后，_wait_for_task 将使用 _explore_task 获取一个Node</p>
+<p>当 _explore_task 成功获取到 Node 时会尝试唤醒另一个线程避免饿死</p>
+<p>tips：线程饿死（Thread Starvation）是指某些线程在系统中无法获得所需的资源而无限期地等待的情况。这些资源可以是CPU时间、内存、锁、文件句柄等。线程饿死可能会导致系统性能下降和资源浪费。</p>
+<p>源码这里的描述也很灵性：The last thief who successfully stole a task will wake up another thief worker to avoid starvation.</p>
+<p>在没有获取到 Node 的时候，遍历所有的worker，检查他们的 _wsq 然后找到一个受害者， 这里的命名很有趣，需要去偷取任务的WorkerID被命名成了vtm(victim), 也就是受害者的意思，实属生动形象了</p>
+<p>这里2PC guard是两阶段提交，一种常见的安全机制，用于确保只有所有参与方同意执行事务时才会执行。</p>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        Executor _wait_for_task 实现相关源码
+    </div>
+    <div class="spoiler-content">
+        <pre><code class="hljs cpp"><span class="hljs-comment">// Function: _wait_for_task</span>
+<span class="hljs-keyword">inline</span> <span class="hljs-keyword">bool</span> Executor::_wait_for_task(Worker&amp; worker, Node*&amp; t) &#123;
+
+  explore_task:
+
+  _explore_task(worker, t);
+  
+  <span class="hljs-comment">// The last thief who successfully stole a task will wake up</span>
+  <span class="hljs-comment">// another thief worker to avoid starvation.</span>
+  <span class="hljs-keyword">if</span>(t) &#123;
+    _notifier.notify(<span class="hljs-literal">false</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+  &#125;
+
+  <span class="hljs-comment">// ---- 2PC guard ----</span>
+  _notifier.prepare_wait(worker._waiter);
+
+  <span class="hljs-keyword">if</span>(!_wsq.empty()) &#123;
+    _notifier.cancel_wait(worker._waiter);
+    worker._vtm = worker._id;
+    <span class="hljs-keyword">goto</span> explore_task;
+  &#125;
+  
+  <span class="hljs-keyword">if</span>(_done) &#123;
+    _notifier.cancel_wait(worker._waiter);
+    _notifier.notify(<span class="hljs-literal">true</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+  &#125;
+  
+  <span class="hljs-comment">// We need to use index-based scanning to avoid data race</span>
+  <span class="hljs-comment">// with _spawn which may initialize a worker at the same time.</span>
+  <span class="hljs-keyword">for</span>(<span class="hljs-keyword">size_t</span> vtm=<span class="hljs-number">0</span>; vtm&lt;_workers.size(); vtm++) &#123;
+    <span class="hljs-keyword">if</span>(!_workers[vtm]._wsq.empty()) &#123;
+      _notifier.cancel_wait(worker._waiter);
+      worker._vtm = vtm;
+      <span class="hljs-keyword">goto</span> explore_task;
+    &#125;
+  &#125;
+  
+  <span class="hljs-comment">// Now I really need to relinguish my self to others</span>
+  _notifier.commit_wait(worker._waiter);
+
+  <span class="hljs-keyword">goto</span> explore_task;
+&#125;</code></pre>
+    </div>
+</div>
+<h4><span id="explore-task">_explore_task</span><a href="#explore-task" class="header-anchor"> </a></h4>
+<p>过程如下:</p>
+<ol>
+<li>获取新的任务，指去一个Worker中偷取(steal)一个任务</li>
+<li>如果偷到了就直接返回了</li>
+<li>如果没偷到且偷得过于频繁(偷取次数超过_MAX_STEALS)就歇歇(堵塞当前线程)</li>
+<li>如果没偷到且歇歇的次数过于频繁(num_yields&gt;100)就直接返回了</li>
+<li>其余情况再找一个受害者</li>
+</ol>
+<p>流程图如下:</p>
+<img src="http://www.plantuml.com/plantuml/svg/SoWkIImgAStDuTBGqbJGrRLJK7hQCVVfykwdFTEKkBWoqnIKNixgVpPdrzEE3S_ch7c-Q__p5TsPAKeA9HcfULmA81tH9KMbgR4AIazszxbMf2QNbkGNFTcnzlciblZoui8NVTkVzazJKe0ejRMrTJ824bofESMfKDrfYK0sHFlJzJkVxfe2iOE0_hoKp3I8yr2SygnZmjEk-I1D-wO_sRtxQTV2M0MWnv3jUpPdrOlclLWKeXW6KVjYM-kB_UtFvZGyNRBywOQvBzPFVTe8Si-pDGkVJTq0TFJJ1LkVBfm73nWbi4uqWr0DW-g06W1o6qWUwZw4ucUR5ZwRqubD2pG-u341qGyE3oHpqCt0umTCyo2cGKXqQOmquW1K1qm_0000">
+<p>源代码如下:</p>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        Executor _explore_task 实现相关源码
+    </div>
+    <div class="spoiler-content">
+        <p><a target="_blank" rel="noopener" href="https://github.com/taskflow/taskflow/blob/master/taskflow/core/executor.hpp#L1288-L1317">github</a></p>
+<pre><code class="hljs cpp"><span class="hljs-keyword">inline</span> <span class="hljs-keyword">void</span> Executor::_explore_task(Worker&amp; w, Node*&amp; t) &#123;
+  <span class="hljs-keyword">size_t</span> num_steals = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">size_t</span> num_yields = <span class="hljs-number">0</span>;
+  <span class="hljs-function"><span class="hljs-built_in">std</span>::uniform_int_distribution&lt;<span class="hljs-keyword">size_t</span>&gt; <span class="hljs-title">rdvtm</span><span class="hljs-params">(<span class="hljs-number">0</span>, _workers.size()<span class="hljs-number">-1</span>)</span></span>;
+  <span class="hljs-comment">// Here, we write do-while to make the worker steal at once</span>
+  <span class="hljs-comment">// from the assigned victim.</span>
+  <span class="hljs-keyword">do</span> &#123;
+    t = (w._id == w._vtm) ? _wsq.steal() : _workers[w._vtm]._wsq.steal();
+    <span class="hljs-keyword">if</span>(t) &#123;
+      <span class="hljs-keyword">break</span>;
+    &#125;
+    <span class="hljs-keyword">if</span>(num_steals++ &gt; _MAX_STEALS) &#123;
+      <span class="hljs-built_in">std</span>::this_thread::yield();
+      <span class="hljs-keyword">if</span>(num_yields++ &gt; <span class="hljs-number">100</span>) &#123;
+        <span class="hljs-keyword">break</span>;
+      &#125;
+    &#125;
+    w._vtm = rdvtm(w._rdgen);
+  &#125; <span class="hljs-keyword">while</span>(!_done);
+&#125;</code></pre>
+    </div>
+</div>
+<h2><span id="sheng-chan-zhe">生产者</span><a href="#sheng-chan-zhe" class="header-anchor"> </a></h2>
+<p>run 方法最终会调用 run_until(Taskflow&amp; f, P&amp;&amp; p, C&amp;&amp; c)</p>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        Executor run 实现相关源码
+    </div>
+    <div class="spoiler-content">
+        <pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-keyword">inline</span> tf::Future&lt;<span class="hljs-keyword">void</span>&gt; <span class="hljs-title">Executor::run</span><span class="hljs-params">(Taskflow&amp; f)</span> </span>&#123;
+  <span class="hljs-keyword">return</span> run_n(f, <span class="hljs-number">1</span>, []()&#123;&#125;);
+&#125;
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> C&gt;
+<span class="hljs-function">tf::Future&lt;<span class="hljs-keyword">void</span>&gt; <span class="hljs-title">Executor::run</span><span class="hljs-params">(Taskflow&amp; f, C&amp;&amp; c)</span> </span>&#123;
+  <span class="hljs-keyword">return</span> run_n(f, <span class="hljs-number">1</span>, <span class="hljs-built_in">std</span>::forward&lt;C&gt;(c));
+&#125;
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> C&gt;
+<span class="hljs-function">tf::Future&lt;<span class="hljs-keyword">void</span>&gt; <span class="hljs-title">Executor::run_n</span><span class="hljs-params">(Taskflow&amp; f, <span class="hljs-keyword">size_t</span> repeat, C&amp;&amp; c)</span> </span>&#123;
+  <span class="hljs-keyword">return</span> run_until(
+    f, [repeat]() <span class="hljs-keyword">mutable</span> &#123; <span class="hljs-keyword">return</span> repeat-- == <span class="hljs-number">0</span>; &#125;, <span class="hljs-built_in">std</span>::forward&lt;C&gt;(c)
+  );
+&#125;
+<span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> P, <span class="hljs-keyword">typename</span> C&gt;
+<span class="hljs-function">tf::Future&lt;<span class="hljs-keyword">void</span>&gt; <span class="hljs-title">Executor::run_until</span><span class="hljs-params">(Taskflow&amp; f, P&amp;&amp; p, C&amp;&amp; c)</span> </span>&#123;
+  _increment_topology();
+  <span class="hljs-comment">// Need to check the empty under the lock since dynamic task may</span>
+  <span class="hljs-comment">// define detached blocks that modify the taskflow at the same time</span>
+  <span class="hljs-keyword">bool</span> empty;
+  &#123;
+    <span class="hljs-function"><span class="hljs-built_in">std</span>::lock_guard&lt;<span class="hljs-built_in">std</span>::mutex&gt; <span class="hljs-title">lock</span><span class="hljs-params">(f._mutex)</span></span>;
+    empty = f.empty();
+  &#125;
+
+  <span class="hljs-comment">// No need to create a real topology but returns an dummy future</span>
+  <span class="hljs-keyword">if</span>(empty || p()) &#123;
+    c();
+    <span class="hljs-built_in">std</span>::promise&lt;<span class="hljs-keyword">void</span>&gt; promise;
+    promise.set_value();
+    _decrement_topology_and_notify();
+    <span class="hljs-keyword">return</span> tf::Future&lt;<span class="hljs-keyword">void</span>&gt;(promise.get_future(), <span class="hljs-built_in">std</span>::monostate&#123;&#125;);
+  &#125;
+  <span class="hljs-comment">// create a topology for this run</span>
+  <span class="hljs-keyword">auto</span> t = <span class="hljs-built_in">std</span>::make_shared&lt;Topology&gt;(f, <span class="hljs-built_in">std</span>::forward&lt;P&gt;(p), <span class="hljs-built_in">std</span>::forward&lt;C&gt;(c));
+  <span class="hljs-comment">// need to create future before the topology got torn down quickly</span>
+  <span class="hljs-function">tf::Future&lt;<span class="hljs-keyword">void</span>&gt; <span class="hljs-title">future</span><span class="hljs-params">(t-&gt;_promise.get_future(), t)</span></span>;
+  <span class="hljs-comment">// modifying topology needs to be protected under the lock</span>
+  &#123;
+    <span class="hljs-function"><span class="hljs-built_in">std</span>::lock_guard&lt;<span class="hljs-built_in">std</span>::mutex&gt; <span class="hljs-title">lock</span><span class="hljs-params">(f._mutex)</span></span>;
+    f._topologies.push(t);
+    <span class="hljs-keyword">if</span>(f._topologies.size() == <span class="hljs-number">1</span>) &#123;
+      _set_up_topology(_this_worker(), t.get());
+    &#125;
+  &#125;
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">future</span>;
+&#125;</code></pre>
+    </div>
+</div>
+<p>_set_up_topology 获取了入度为0的Node，将这些 Node 组装成了一个 Node 的 list</p>
+<p>最终调用了 _schedule 将这些Node放到了对应worker的_wsq中或Executor的_wsq，而消费者线程会不停的尝试从 _wsq 中获取 Node 并执行Node对应函数</p>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        Executor _set_up_topology 实现相关源码
+    </div>
+    <div class="spoiler-content">
+        <pre><code class="hljs cpp"><span class="hljs-keyword">inline</span> <span class="hljs-keyword">void</span> Executor::_set_up_topology(Worker* worker, Topology* tpg) &#123;
+  <span class="hljs-comment">// ---- under taskflow lock ----</span>
+  tpg-&gt;_sources.clear();
+  tpg-&gt;_taskflow._graph._clear_detached();
+
+  <span class="hljs-comment">// scan each node in the graph and build up the links</span>
+  <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> node : tpg-&gt;_taskflow._graph._nodes) &#123;
+
+    node-&gt;_topology = tpg;
+    node-&gt;_parent = <span class="hljs-literal">nullptr</span>;
+    node-&gt;_state.store(<span class="hljs-number">0</span>, <span class="hljs-built_in">std</span>::memory_order_relaxed);
+
+    <span class="hljs-keyword">if</span>(node-&gt;num_dependents() == <span class="hljs-number">0</span>) &#123;
+      tpg-&gt;_sources.push_back(node);
+    &#125;
+
+    node-&gt;_set_up_join_counter();
+  &#125;
+
+  tpg-&gt;_join_counter = tpg-&gt;_sources.size();
+
+  <span class="hljs-keyword">if</span>(worker) &#123;
+    _schedule(*worker, tpg-&gt;_sources);
+  &#125;
+  <span class="hljs-keyword">else</span> &#123;
+    _schedule(tpg-&gt;_sources);
+  &#125;
+&#125;</code></pre>
+    </div>
+</div>
+<p>以下是调度方法的不同重载形式，将一个(Node* node)或多个(SmallVector&lt;Node*&gt;&amp; nodes)放到对应worker的_wsq中，如果没有对应的worker就放入Executor的_wsq</p>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        Executor _schedule 实现相关源码
+    </div>
+    <div class="spoiler-content">
+        <pre><code class="hljs cpp"><span class="hljs-comment">// Procedure: _schedule</span>
+<span class="hljs-keyword">inline</span> <span class="hljs-keyword">void</span> Executor::_schedule(Worker&amp; worker, Node* node) &#123;
+  
+  <span class="hljs-comment">// We need to fetch p before the release such that the read </span>
+  <span class="hljs-comment">// operation is synchronized properly with other thread to</span>
+  <span class="hljs-comment">// void data race.</span>
+  <span class="hljs-keyword">auto</span> p = node-&gt;_priority;
+
+  node-&gt;_state.fetch_or(Node::READY, <span class="hljs-built_in">std</span>::memory_order_release);
+
+  <span class="hljs-comment">// caller is a worker to this pool - starting at v3.5 we do not use</span>
+  <span class="hljs-comment">// any complicated notification mechanism as the experimental result</span>
+  <span class="hljs-comment">// has shown no significant advantage.</span>
+  <span class="hljs-keyword">if</span>(worker._executor == <span class="hljs-keyword">this</span>) &#123;
+    worker._wsq.push(node, p);
+    _notifier.notify(<span class="hljs-literal">false</span>);
+    <span class="hljs-keyword">return</span>;
+  &#125;
+
+  &#123;
+    <span class="hljs-function"><span class="hljs-built_in">std</span>::lock_guard&lt;<span class="hljs-built_in">std</span>::mutex&gt; <span class="hljs-title">lock</span><span class="hljs-params">(_wsq_mutex)</span></span>;
+    _wsq.push(node, p);
+  &#125;
+
+  _notifier.notify(<span class="hljs-literal">false</span>);
+&#125;
+
+<span class="hljs-comment">// Procedure: _schedule</span>
+<span class="hljs-keyword">inline</span> <span class="hljs-keyword">void</span> Executor::_schedule(Node* node) &#123;
+  
+  <span class="hljs-comment">// We need to fetch p before the release such that the read </span>
+  <span class="hljs-comment">// operation is synchronized properly with other thread to</span>
+  <span class="hljs-comment">// void data race.</span>
+  <span class="hljs-keyword">auto</span> p = node-&gt;_priority;
+
+  node-&gt;_state.fetch_or(Node::READY, <span class="hljs-built_in">std</span>::memory_order_release);
+
+  &#123;
+    <span class="hljs-function"><span class="hljs-built_in">std</span>::lock_guard&lt;<span class="hljs-built_in">std</span>::mutex&gt; <span class="hljs-title">lock</span><span class="hljs-params">(_wsq_mutex)</span></span>;
+    _wsq.push(node, p);
+  &#125;
+
+  _notifier.notify(<span class="hljs-literal">false</span>);
+&#125;
+
+<span class="hljs-comment">// Procedure: _schedule</span>
+<span class="hljs-keyword">inline</span> <span class="hljs-keyword">void</span> Executor::_schedule(Worker&amp; worker, <span class="hljs-keyword">const</span> SmallVector&lt;Node*&gt;&amp; nodes) &#123;
+
+  <span class="hljs-comment">// We need to cacth the node count to avoid accessing the nodes</span>
+  <span class="hljs-comment">// vector while the parent topology is removed!</span>
+  <span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span> num_nodes = nodes.size();
+
+  <span class="hljs-keyword">if</span>(num_nodes == <span class="hljs-number">0</span>) &#123;
+    <span class="hljs-keyword">return</span>;
+  &#125;
+
+  <span class="hljs-comment">// caller is a worker to this pool - starting at v3.5 we do not use</span>
+  <span class="hljs-comment">// any complicated notification mechanism as the experimental result</span>
+  <span class="hljs-comment">// has shown no significant advantage.</span>
+  <span class="hljs-keyword">if</span>(worker._executor == <span class="hljs-keyword">this</span>) &#123;
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">size_t</span> i=<span class="hljs-number">0</span>; i&lt;num_nodes; ++i) &#123;
+      <span class="hljs-comment">// We need to fetch p before the release such that the read </span>
+      <span class="hljs-comment">// operation is synchronized properly with other thread to</span>
+      <span class="hljs-comment">// void data race.</span>
+      <span class="hljs-keyword">auto</span> p = nodes[i]-&gt;_priority;
+      nodes[i]-&gt;_state.fetch_or(Node::READY, <span class="hljs-built_in">std</span>::memory_order_release);
+      worker._wsq.push(nodes[i], p);
+      _notifier.notify(<span class="hljs-literal">false</span>);
+    &#125;
+    <span class="hljs-keyword">return</span>;
+  &#125;
+
+  &#123;
+    <span class="hljs-function"><span class="hljs-built_in">std</span>::lock_guard&lt;<span class="hljs-built_in">std</span>::mutex&gt; <span class="hljs-title">lock</span><span class="hljs-params">(_wsq_mutex)</span></span>;
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">size_t</span> k=<span class="hljs-number">0</span>; k&lt;num_nodes; ++k) &#123;
+      <span class="hljs-keyword">auto</span> p = nodes[k]-&gt;_priority;
+      nodes[k]-&gt;_state.fetch_or(Node::READY, <span class="hljs-built_in">std</span>::memory_order_release);
+      _wsq.push(nodes[k], p);
+    &#125;
+  &#125;
+
+  _notifier.notify_n(num_nodes);
+&#125;
+
+<span class="hljs-comment">// Procedure: _schedule</span>
+<span class="hljs-keyword">inline</span> <span class="hljs-keyword">void</span> Executor::_schedule(<span class="hljs-keyword">const</span> SmallVector&lt;Node*&gt;&amp; nodes) &#123;
+
+  <span class="hljs-comment">// parent topology may be removed!</span>
+  <span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span> num_nodes = nodes.size();
+
+  <span class="hljs-keyword">if</span>(num_nodes == <span class="hljs-number">0</span>) &#123;
+    <span class="hljs-keyword">return</span>;
+  &#125;
+
+  <span class="hljs-comment">// We need to fetch p before the release such that the read </span>
+  <span class="hljs-comment">// operation is synchronized properly with other thread to</span>
+  <span class="hljs-comment">// void data race.</span>
+  &#123;
+    <span class="hljs-function"><span class="hljs-built_in">std</span>::lock_guard&lt;<span class="hljs-built_in">std</span>::mutex&gt; <span class="hljs-title">lock</span><span class="hljs-params">(_wsq_mutex)</span></span>;
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">size_t</span> k=<span class="hljs-number">0</span>; k&lt;num_nodes; ++k) &#123;
+      <span class="hljs-keyword">auto</span> p = nodes[k]-&gt;_priority;
+      nodes[k]-&gt;_state.fetch_or(Node::READY, <span class="hljs-built_in">std</span>::memory_order_release);
+      _wsq.push(nodes[k], p);
+    &#125;
+  &#125;
+
+  _notifier.notify_n(num_nodes);
+&#125;</code></pre>
+    </div>
+</div>
+<link rel="stylesheet" href="/ChrisJaunes/css/spoiler.css" type="text/css"><script src="/ChrisJaunes/js/spoiler.js" type="text/javascript" async></script>
+        </div>
+        <div class="article-tags">
+            <ul class="tags-list cl">
+                <li><a href="/ChrisJaunes/tags/TaskFlow/"><i class="fa fa-tag"></i>TaskFlow</a></li>
+            </ul>
+        </div>
+        <div class="article-pagination cl">
+            <div class="pagination-next">
+                <a href="/ChrisJaunes/2023/02/20/python-mock-%E7%94%A8%E6%B3%95%E6%B5%85%E6%9E%90-%E6%9B%BF%E6%8D%A2%E8%A2%AB%E6%B5%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9F%90%E4%BA%9B%E9%83%A8%E5%88%86/">下一篇：python-mock-用法浅析-替换被测系统的某些部分</a>
+            </div>
+        </div> 
+        
+            <link rel="stylesheet" href="https://unpkg.com/gitalk@latest/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
+<script src="https://priesttomb.github.io/js/md5.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    new Gitalk({
+        clientID: '0ba2ec4192b1d2fb9cb6',
+        clientSecret: '85deadc0e6ed5bdf825a822ab2fdfbad69401fb9',
+        repo: 'ChrisJaunes',
+        owner: 'ChrisJaunes',
+        admin: 'ChrisJaunes',
+        id: md5(location.pathname),
+        distractionFreeMode: true,
+        proxy: 'https://vercel.prohibitorum.top/github_access_token'
+    }).render('gitalk-container')
+</script>
+        
+    </div>
+
+</article>
+    </section>
+        
+<section class="tool-area">
+
+    <div class="toolbar">
+        
+
+        
+        <div class="widget-post widget" style="order: 1 ">
+            <h2 class="widget-title"><i class="fa fa-file-text"></i> Recent articles</h2>
+            <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2023/05/25/TaskFlow-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-Executor%E7%B1%BB/">TaskFlow-源码浅析-Executor类</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2023/02/20/python-mock-%E7%94%A8%E6%B3%95%E6%B5%85%E6%9E%90-%E6%9B%BF%E6%8D%A2%E8%A2%AB%E6%B5%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9F%90%E4%BA%9B%E9%83%A8%E5%88%86/">python-mock-用法浅析-替换被测系统的某些部分</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/09/05/DRF-ModelSerializer-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-%E5%BA%8F%E5%88%97%E5%8C%96/">DRF-ModelSerializer-源码浅析-序列化</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/08/02/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95-mock%E6%B5%85%E6%9E%90-1-%E6%A6%82%E8%BF%B0/">单元测试-mock浅析-1-概述</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/26/ZooKeeper-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E7%9B%B8%E5%85%B3/">ZooKeeper-源码浅析-数据模型相关</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/25/ZooKeeper-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B/">ZooKeeper-数据模型</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/25/ZooKeeper-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">ZooKeeper-环境搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/02/D3-Format-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90/">D3-Format-源码浅析</a></li></ul>
+        </div>
+        
+
+        
+        <div class="widget-tags widget" style="order: 2 ">
+            <h2 class="widget-title"><i class="fa fa-tags"></i> Tag</h2>
+            <a href="/ChrisJaunes/tags/Blockly/" style="font-size: 14px;">Blockly</a> <a href="/ChrisJaunes/tags/C/" style="font-size: 14px;">C++</a> <a href="/ChrisJaunes/tags/D3/" style="font-size: 10px;">D3</a> <a href="/ChrisJaunes/tags/Http/" style="font-size: 16px;">Http</a> <a href="/ChrisJaunes/tags/HttpServer/" style="font-size: 16px;">HttpServer</a> <a href="/ChrisJaunes/tags/Java/" style="font-size: 20px;">Java</a> <a href="/ChrisJaunes/tags/Jupyter/" style="font-size: 12px;">Jupyter</a> <a href="/ChrisJaunes/tags/Linux/" style="font-size: 10px;">Linux</a> <a href="/ChrisJaunes/tags/Mock/" style="font-size: 10px;">Mock</a> <a href="/ChrisJaunes/tags/Net/" style="font-size: 12px;">Net</a> <a href="/ChrisJaunes/tags/Presto/" style="font-size: 12px;">Presto</a> <a href="/ChrisJaunes/tags/Python/" style="font-size: 18px;">Python</a> <a href="/ChrisJaunes/tags/Servlet/" style="font-size: 12px;">Servlet</a> <a href="/ChrisJaunes/tags/Skulpt/" style="font-size: 10px;">Skulpt</a> <a href="/ChrisJaunes/tags/Sql%E8%A7%A3%E6%9E%90/" style="font-size: 12px;">Sql解析</a> <a href="/ChrisJaunes/tags/TaskFlow/" style="font-size: 10px;">TaskFlow</a> <a href="/ChrisJaunes/tags/TensorFlow/" style="font-size: 10px;">TensorFlow</a> <a href="/ChrisJaunes/tags/ZooKeeper/" style="font-size: 14px;">ZooKeeper</a> <a href="/ChrisJaunes/tags/container/" style="font-size: 10px;">container</a> <a href="/ChrisJaunes/tags/django/" style="font-size: 10px;">django</a> <a href="/ChrisJaunes/tags/metakernel/" style="font-size: 10px;">metakernel</a> <a href="/ChrisJaunes/tags/python/" style="font-size: 10px;">python</a> <a href="/ChrisJaunes/tags/test/" style="font-size: 10px;">test</a> <a href="/ChrisJaunes/tags/web/" style="font-size: 10px;">web</a> <a href="/ChrisJaunes/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 14px;">分布式</a> <a href="/ChrisJaunes/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size: 10px;">单元测试</a> <a href="/ChrisJaunes/tags/%E5%BA%8F%E5%88%97%E5%8C%96/" style="font-size: 10px;">序列化</a>
+        </div>
+        
+
+        
+            <div class="widget-categories widget" style="order: 3 ">
+                <h2 class="widget-title"><i class="fa fa-folder-open"></i> Categories</h2>
+                 <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Blockly/">Blockly</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Blockly/BlocklyJupyter/">BlocklyJupyter</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/C/">C++</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/C/%E6%A0%87%E5%87%86%E5%BA%93/">标准库</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/D3/">D3</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/">Java</a><span class="category-list-count">6</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Http/">Http</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Http/HttpServer/">HttpServer</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Servlet/">Servlet</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Presto/">Presto</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Presto/SqlParser/">SqlParser</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/">Python</a><span class="category-list-count">5</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Docx/">Docx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Json/">Json</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Mock/">Mock</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0/">内置函数</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Skulpt/">Skulpt</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TaskFlow/">TaskFlow</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TensorFlow/">TensorFlow</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TensorFlow/env/">env</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/django/">django</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/programing-language/">programing_language</a><span class="category-list-count">6</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/programing-language/%E6%AF%94%E8%BE%83%E5%AD%A6%E4%B9%A0/">比较学习</a><span class="category-list-count">6</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a><span class="category-list-count">3</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%88%86%E5%B8%83%E5%BC%8F/ZooKeeper/">ZooKeeper</a><span class="category-list-count">3</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">单元测试</a><span class="category-list-count">1</span></li></ul> 
+            </div>         
+        
+    </div>
+</section>
+</div>
+
+
+<footer class="footer">
+	<p class="footer-intro">
+		
+		@2023 ChrisJaunes.
+	</p>
+	<p class="footer-intro">
+			Powered By <a href="https://github.com/ChrisJaunes" target="_blank"> ChrisJaunes </a> |
+			Hexo Powered By <a href="https://hexo.io/zh-cn/" target="_blank">hexo</a> |
+			Theme Powered by ChrisJaunes 
+	</p>
+	<p class="footer-intro">
+		<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+		<span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次 &nbsp;|&nbsp;</span>
+		<span id="busuanzi_container_site_uv">访客数<span id="busuanzi_value_site_uv"></span>人次&nbsp;|&nbsp;</span>
+		<span id="busuanzi_container_page_pv">本文总阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+	</p>
+</footer>
+
+
+
+
+<div class="extend-tools" id="extend-tools" style="display: none;">
+    <ul>
+        <li class="tools-returnTop" title="Back to top"><i class="fa fa-angle-double-up"></i></li>
+    </ul>
+</div>
+
+	</div>
+
+
+<script src="/ChrisJaunes/js/org/jquery.min.js"></script>
+
+
+<script src="/ChrisJaunes/js/extend.js"></script>
+
+</body>
+</html>
