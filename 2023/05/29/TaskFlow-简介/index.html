@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 	<meta name="description" content="欢迎来的ChrisJaunes的世界">
 	<meta name="keywords" content="chrisjaunes">
-	<title>Docx - ChrisJaunes</title>
+	<title>TaskFlow-简介 - ChrisJaunes</title>
 	
 	<link rel="shortcut icon" href="/ChrisJaunes/imgs/avatar.jpg"/>
 	
@@ -68,51 +68,86 @@
 </nav>
 
         
-<div class="column-title fadeToTop">
-    <h3><span class="title-info">Categories</span> Docx</h3>
-</div>
 <div class="con-wrap fadeToTop">
-    
     <section class="article-area">
-    
-    
         
 <article class="article">
     <div class="article-wrap">
         <h2 class="article-title cl">
-            <a href="/ChrisJaunes/2021/05/20/python-docx-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-%E5%88%9B%E5%BB%BADocument/" title="python-docx-源码浅析-创建Document">
-                python-docx-源码浅析-创建Document
+            <a href="/ChrisJaunes/2023/05/29/TaskFlow-%E7%AE%80%E4%BB%8B/" title="TaskFlow-简介">
+                TaskFlow-简介
             </a>
         </h2>
         <ul class="article-extra" style="margin-bottom: 20px">
             <li class="article-time">
-                2021-05-20
+                2023-05-29
             </li> 
             <li class="article-category">
                 <ol class="category-list cl">
                     <i class="fa fa-folder-o"></i>
-                        <li><a href="/categories/Python/">Python</a></li>
+                        <li><a href="/categories/TaskFlow/">TaskFlow</a></li>
                 </ol>
             </li>
         </ul>
         <div class="article-description">
-            浅析了python-docx库
+            <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1><span id="basic">basic</span><a href="#basic" class="header-anchor"> </a></h1>
+<p>Taskflow 是一款 C++ 下任务流程框架，可以管理 Pipeline 并执行并行工作</p>
+<p>官方网站: <a target="_blank" rel="noopener" href="https://taskflow.github.io/">https://taskflow.github.io/</a></p>
+<p>github 地址: <a target="_blank" rel="noopener" href="https://github.com/taskflow/taskflow">https://github.com/taskflow/taskflow</a></p>
+<p>官方文档: <a target="_blank" rel="noopener" href="https://taskflow.github.io/taskflow/index.html">https://taskflow.github.io/taskflow/index.html</a></p>
+<p>使用参考: <a target="_blank" rel="noopener" href="https://www.zywvvd.com/notes/coding/cpp/taskflow/taskflow/">https://www.zywvvd.com/notes/coding/cpp/taskflow/taskflow/</a></p>
+<h1><span id="taskflow-li-ge-ge-lei-jie-shao">TaskFlow里各个类介绍</span><a href="#taskflow-li-ge-ge-lei-jie-shao" class="header-anchor"> </a></h1>
+<h2><span id="node">Node</span><a href="#node" class="header-anchor"> </a></h2>
+<p>Node类是TaskFlow中最重要的类，该类保存了当前节点的执行函数、前驱节点指针、后继节点指针、前继节点完成计数器。</p>
+<p>执行函数使用std::variant 保存，std::variant 是c++17新加入的容器，提供了更安全的union, 在TaskFlow中，目前可以接受的函数类型为Static、Dynamic、Condition、MultiCondition、Module、Async、SilentAsync、cudaFlow、syclFlow、Runtime 10类。</p>
+<p>_precede 用于向该节点添加后继节点，是构建任务拓扑关系的重要函数。</p>
+<h2><span id="task">Task</span><a href="#task" class="header-anchor"> </a></h2>
+<p>Task类是对Node类的包装，该类弱引用一个Node对象指针，可以防止使用方直接操作内部存储。</p>
+<p>Task提供了succeed和precede来为Task间添加依赖关系，A.succeed(B)代表A依赖B，与B.precede(A)等价，实际上A的succeed方法就是调用了B的Node的_precede方法。</p>
+<h2><span id="graph">Graph</span><a href="#graph" class="header-anchor"> </a></h2>
+<p>Graph类负责管理Node对象的内存，为了避免赋值和拷贝引起的问题，Graph显示删除了拷贝构造函数和赋值操作函数。</p>
+<p>Graph中的_nodes使用vector容器维护Graph 中Node对象的指针。node_pool是一个管理Node的内存池，采用内存池可以避免频繁调用malloc/free, 减少内存碎片化，提高内存使用率，提高内存分配速度，降低分配开销。该类使用emplace_back将执行函数封装成Node节点，emplace_back方法从node_pool中管理的内存池里获取一个node，并初始化node对象，然后指向该node对象的指针会被加入到Graph的_nodes中。</p>
+<h2><span id="taskflow">TaskFlow</span><a href="#taskflow" class="header-anchor"> </a></h2>
+<p>TaskFlow 类继承于FlowBuilder，保存了Graph对象。提供了emplace方法在Graph中创建新节点，并使用callable参数作为现新节点的执行函数。</p>
+<h2><span id="topology">Topology</span><a href="#topology" class="header-anchor"> </a></h2>
+<p>Topology 用于管理Graph的拓扑结构，_bind将绑定一个Graph对象，保存了所有入口节点指针，出口个数，出口节点完成计数器。</p>
+<h2><span id="executor">Executor</span><a href="#executor" class="header-anchor"> </a></h2>
+<p>Executor 类是负责执行TaskFlow的类。在该类中会创建工作线程，如果没有指定工作线程数量，调用hardware_concurrency获取能并发在一个程序中的线程数量，hardware_concurrency在linux系统中一般返回CPU核心数量。</p>
+<link rel="stylesheet" href="/ChrisJaunes/css/spoiler.css" type="text/css"><script src="/ChrisJaunes/js/spoiler.js" type="text/javascript" async></script>
         </div>
         <div class="article-tags">
             <ul class="tags-list cl">
-                <li><a href="/ChrisJaunes/tags/Python/"><i class="fa fa-tag"></i>Python</a></li>
+                <li><a href="/ChrisJaunes/tags/TaskFlow/"><i class="fa fa-tag"></i>TaskFlow</a></li>
             </ul>
         </div>
+        <div class="article-pagination cl">
+            <div class="pagination-next">
+                <a href="/ChrisJaunes/2023/05/25/TaskFlow-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-Executor%E7%B1%BB/">下一篇：TaskFlow-源码浅析-Executor类</a>
+            </div>
+        </div> 
+        
+            <link rel="stylesheet" href="https://unpkg.com/gitalk@latest/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
+<script src="https://priesttomb.github.io/js/md5.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    new Gitalk({
+        clientID: '0ba2ec4192b1d2fb9cb6',
+        clientSecret: '85deadc0e6ed5bdf825a822ab2fdfbad69401fb9',
+        repo: 'ChrisJaunes',
+        owner: 'ChrisJaunes',
+        admin: 'ChrisJaunes',
+        id: md5(location.pathname),
+        distractionFreeMode: true,
+        proxy: 'https://vercel.prohibitorum.top/github_access_token'
+    }).render('gitalk-container')
+</script>
+        
     </div>
 
 </article>
-
-    
-    <ul class="pagination clear">
-    <span class="page-number current">1</span>
-</ul>
     </section>
-    
+        
 <section class="tool-area">
 
     <div class="toolbar">
@@ -141,7 +176,6 @@
     </div>
 </section>
 </div>
-
 
 
 <footer class="footer">
