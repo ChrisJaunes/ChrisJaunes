@@ -44,6 +44,7 @@ render_drafts: false
 post_asset_folder: true
 relative_link: false
 future: true
+# 代码高亮
 highlight:
   enable: true
   line_number: false
