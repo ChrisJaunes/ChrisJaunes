@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="description" content="欢迎来的ChrisJaunes的世界">
+	<meta name="keywords" content="chrisjaunes">
+	<title>杂谈-使用SQL计算最长连续字串 - ChrisJaunes</title>
+	
+	<link rel="shortcut icon" href="/ChrisJaunes/imgs/avatar.jpg"/>
+	
+<link rel="stylesheet" href="/ChrisJaunes/css/style.css">
+
+	
+<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+<body>
+	<div class="main-con">
+<nav class="nav cl">
+    <ul class="cl nav-list">
+        <li>
+            <a href="/ChrisJaunes/" class="">
+                <i class="fa fa-home"></i> 
+                <span>主页</span>
+            </a>
+        </li>
+        <li>
+            <a href="/ChrisJaunes/archives/" class="">
+                <i class=" fa-"></i> 
+                <span>归档</span>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" class="">
+                <i class=" fa-"></i> 
+                <span>关于</span>
+                <span class="drop-flag fa fa-angle-down"></span>
+            </a>
+            <dl>
+                <li>
+                    <a href="/ChrisJaunes/about" class="">
+                    <i class=" fa-"></i>
+                    <span>关于本站</span>
+                    </a>
+                </li>
+            </dl>
+        </li>
+    </ul>
+    <ul class="cl nav-tool">
+        <li>
+            <a target="_blank" rel="noopener" href="https://github.com/ChrisJaunes">
+                <i class="fa fa-github"></i>
+            </a>
+        </li>
+        <li>
+            <a href="mailto:judgehuang@tencent.com">
+                <i class="fa fa-envelope"></i>
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" class="nav-search-btn">
+                <i class="fa fa-search"></i>
+            </a>
+        </li>
+    </ul>
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="nav-search"><input type="search" name="q" class="nav-search-input" placeholder="search..."><input type="hidden" name="sitesearch" value="https://chrisjaunes.github.io"></form>
+</nav>
+
+        
+<div class="con-wrap fadeToTop">
+    <section class="article-area">
+        
+<article class="article">
+    <div class="article-wrap">
+        <h2 class="article-title cl">
+            <a href="/ChrisJaunes/2023/06/29/%E6%9D%82%E8%B0%88-%E4%BD%BF%E7%94%A8SQL%E8%AE%A1%E7%AE%97%E6%9C%80%E9%95%BF%E8%BF%9E%E7%BB%AD%E5%AD%97%E4%B8%B2/" title="杂谈-使用SQL计算最长连续字串">
+                杂谈-使用SQL计算最长连续字串
+            </a>
+        </h2>
+        <ul class="article-extra" style="margin-bottom: 20px">
+            <li class="article-time">
+                2023-06-29
+            </li> 
+            <li class="article-category">
+                <ol class="category-list cl">
+                    <i class="fa fa-folder-o"></i>
+                        <li><a href="/categories/杂谈/">杂谈</a></li>
+                </ol>
+            </li>
+        </ul>
+        <div class="article-description">
+            <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>最长连续子串是指在一个字符串中，找到最长的连续出现的字符子串。例如，在字符串 “aabbbbaaa” 中，最长连续子串是 “bbbb”。</p>
+<p>滑动窗口自然可以轻松解决这个问题，不过用纯SQL很难实现滑动窗口</p>
+<p>自然，如果愿意写UDF，自然可以UDF一把梭，不过维护UDF带来了额外的成本</p>
+<p>然后我们找找有没有纯SQL的实现方案</p>
+<p>SQL最常使用的手段是group, 把相同的元素聚合起来，于是我们考虑如何让 连续的子串 中的 每一个字符 变为连续的值</p>
+<p>我们可以使用差分手法，计算每个字符在该类型字符中的排名以及在整个字符串的排名</p>
+<p>以aabbbbaaa为例：</p>
+<table>
+<thead>
+<tr>
+<th>-</th>
+<th>a</th>
+<th>a</th>
+<th>b</th>
+<th>b</th>
+<th>b</th>
+<th>b</th>
+<th>a</th>
+<th>a</th>
+<th>a</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>在该类型值中的排名</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+</tr>
+<tr>
+<td>在整个字符串的排名</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>7</td>
+<td>8</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+<p>对于一个区间(假设区间第一个字符在该类型值中的排名为x1，在整个字符串的排名为x2), 如果都是同样的字符，那么：</p>
+<p>区间第i个字符在该类型值中的排名为: x1+i, 在整个字符串的排名为: x2+i, 相减以后：(x2+i)-(x1+i)=(x2-x1)</p>
+<p>也就是同一个区间如果都是同样的字符，那么两个排名相减以后是一样的值</p>
+<p>这也表明，同样的字符如果两个排名相减以后是一样的，那么他们之间不会有其余字符</p>
+<p>因为整个字符串的排名是依次增加的，不妨设为x2位与x2+i位，其中x2位在该类型值中的排名为: x1，如果之间有其余字符，那么x2+i位在该类型值中的排名必然小于x1+i, 与两个排名相减以后是一样的矛盾</p>
+<p>至于不同字符两个排名相减会相同，这个不重要</p>
+<p>这两个排名都可以利用窗口函数ROW_NUMBER计算，计算排名差分以后通过group可以得到一系列的连续的子串，就可以继续计算最长连续字串了</p>
+<p>参考代码：</p>
+<div class="spoiler collapsed">
+    <div class="spoiler-title">
+        表结构
+    </div>
+    <div class="spoiler-content">
+        <p>表结构：id 代表序列 value 代表值</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>a</td>
+</tr>
+<tr>
+<td>2</td>
+<td>a</td>
+</tr>
+<tr>
+<td>3</td>
+<td>b</td>
+</tr>
+<tr>
+<td>4</td>
+<td>b</td>
+</tr>
+<tr>
+<td>5</td>
+<td>b</td>
+</tr>
+<tr>
+<td>6</td>
+<td>b</td>
+</tr>
+<tr>
+<td>7</td>
+<td>a</td>
+</tr>
+<tr>
+<td>8</td>
+<td>a</td>
+</tr>
+<tr>
+<td>9</td>
+<td>a</td>
+</tr>
+</tbody>
+</table>
+
+    </div>
+</div>
+<pre><code class="hljs sql"><span class="hljs-keyword">WITH</span> ordered_sequences <span class="hljs-keyword">AS</span> (
+  <span class="hljs-keyword">SELECT</span> id, <span class="hljs-keyword">value</span>,
+         <span class="hljs-built_in">ROW_NUMBER</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> id) <span class="hljs-keyword">AS</span> row_num,
+         <span class="hljs-built_in">ROW_NUMBER</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> <span class="hljs-keyword">value</span> <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> id) <span class="hljs-keyword">AS</span> group_num
+  <span class="hljs-keyword">FROM</span> sequences
+),
+group_lengths <span class="hljs-keyword">AS</span> (
+  <span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">value</span>, row_num <span class="hljs-operator">-</span> group_num <span class="hljs-keyword">as</span> <span class="hljs-keyword">offset</span>, <span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">AS</span> group_length
+  <span class="hljs-keyword">FROM</span> ordered_sequences
+  <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> <span class="hljs-number">1</span>, <span class="hljs-number">2</span>
+),
+max_group_length <span class="hljs-keyword">AS</span> (
+  <span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">value</span>, <span class="hljs-built_in">MAX</span>(group_length) <span class="hljs-keyword">AS</span> max_length
+  <span class="hljs-keyword">FROM</span> group_lengths
+  <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> <span class="hljs-number">1</span>
+)
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span>
+<span class="hljs-keyword">FROM</span> max_group_length
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> max_length <span class="hljs-keyword">DESC</span>
+LIMIT <span class="hljs-number">1</span>;</code></pre>
+<p>如果是想计算aabbbbaaa这样的形式的</p>
+<table>
+<thead>
+<tr>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>aabbbbaaa</td>
+</tr>
+</tbody>
+</table>
+<p>emm 将一行数据中的字符串拆分为多行不就好了？例如presto中使用UNSET</p>
+<link rel="stylesheet" href="/ChrisJaunes/css/spoiler.css" type="text/css"><script src="/ChrisJaunes/js/spoiler.js" type="text/javascript" async></script>
+        </div>
+        <div class="article-tags">
+            <ul class="tags-list cl">
+                <li><a href="/ChrisJaunes/tags/%E6%9D%82%E8%B0%88/"><i class="fa fa-tag"></i>杂谈</a></li>
+            </ul>
+        </div>
+        <div class="article-pagination cl">
+            <div class="pagination-next">
+                <a href="/ChrisJaunes/2023/05/29/TaskFlow-%E7%AE%80%E4%BB%8B/">下一篇：TaskFlow-简介</a>
+            </div>
+        </div> 
+        
+            <link rel="stylesheet" href="https://unpkg.com/gitalk@latest/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
+<script src="https://priesttomb.github.io/js/md5.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    new Gitalk({
+        clientID: '0ba2ec4192b1d2fb9cb6',
+        clientSecret: '85deadc0e6ed5bdf825a822ab2fdfbad69401fb9',
+        repo: 'ChrisJaunes',
+        owner: 'ChrisJaunes',
+        admin: 'ChrisJaunes',
+        id: md5(location.pathname),
+        distractionFreeMode: true,
+        proxy: 'https://vercel.prohibitorum.top/github_access_token'
+    }).render('gitalk-container')
+</script>
+        
+    </div>
+
+</article>
+    </section>
+        
+<section class="tool-area">
+
+    <div class="toolbar">
+        
+
+        
+        <div class="widget-post widget" style="order: 1 ">
+            <h2 class="widget-title"><i class="fa fa-file-text"></i> Recent articles</h2>
+            <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2023/06/29/%E6%9D%82%E8%B0%88-%E4%BD%BF%E7%94%A8SQL%E8%AE%A1%E7%AE%97%E6%9C%80%E9%95%BF%E8%BF%9E%E7%BB%AD%E5%AD%97%E4%B8%B2/">杂谈-使用SQL计算最长连续字串</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2023/05/29/TaskFlow-%E7%AE%80%E4%BB%8B/">TaskFlow-简介</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2023/05/25/TaskFlow-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-Executor%E7%B1%BB/">TaskFlow-源码浅析-Executor类</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2023/02/20/python-mock-%E7%94%A8%E6%B3%95%E6%B5%85%E6%9E%90-%E6%9B%BF%E6%8D%A2%E8%A2%AB%E6%B5%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%9F%90%E4%BA%9B%E9%83%A8%E5%88%86/">python-mock-用法浅析-替换被测系统的某些部分</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/09/05/DRF-ModelSerializer-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-%E5%BA%8F%E5%88%97%E5%8C%96/">DRF-ModelSerializer-源码浅析-序列化</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/08/02/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95-mock%E6%B5%85%E6%9E%90-1-%E6%A6%82%E8%BF%B0/">单元测试-mock浅析-1-概述</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/26/ZooKeeper-%E6%BA%90%E7%A0%81%E6%B5%85%E6%9E%90-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E7%9B%B8%E5%85%B3/">ZooKeeper-源码浅析-数据模型相关</a></li><li class="post-list-item"><a class="post-list-link" href="/ChrisJaunes/2022/04/25/ZooKeeper-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B/">ZooKeeper-数据模型</a></li></ul>
+        </div>
+        
+
+        
+        <div class="widget-tags widget" style="order: 2 ">
+            <h2 class="widget-title"><i class="fa fa-tags"></i> Tag</h2>
+            <a href="/ChrisJaunes/tags/Blockly/" style="font-size: 14px;">Blockly</a> <a href="/ChrisJaunes/tags/C/" style="font-size: 14px;">C++</a> <a href="/ChrisJaunes/tags/D3/" style="font-size: 10px;">D3</a> <a href="/ChrisJaunes/tags/Http/" style="font-size: 16px;">Http</a> <a href="/ChrisJaunes/tags/HttpServer/" style="font-size: 16px;">HttpServer</a> <a href="/ChrisJaunes/tags/Java/" style="font-size: 20px;">Java</a> <a href="/ChrisJaunes/tags/Jupyter/" style="font-size: 12px;">Jupyter</a> <a href="/ChrisJaunes/tags/Linux/" style="font-size: 10px;">Linux</a> <a href="/ChrisJaunes/tags/Mock/" style="font-size: 10px;">Mock</a> <a href="/ChrisJaunes/tags/Net/" style="font-size: 12px;">Net</a> <a href="/ChrisJaunes/tags/Presto/" style="font-size: 12px;">Presto</a> <a href="/ChrisJaunes/tags/Python/" style="font-size: 18px;">Python</a> <a href="/ChrisJaunes/tags/Servlet/" style="font-size: 12px;">Servlet</a> <a href="/ChrisJaunes/tags/Skulpt/" style="font-size: 10px;">Skulpt</a> <a href="/ChrisJaunes/tags/Sql%E8%A7%A3%E6%9E%90/" style="font-size: 12px;">Sql解析</a> <a href="/ChrisJaunes/tags/TaskFlow/" style="font-size: 12px;">TaskFlow</a> <a href="/ChrisJaunes/tags/TensorFlow/" style="font-size: 10px;">TensorFlow</a> <a href="/ChrisJaunes/tags/ZooKeeper/" style="font-size: 14px;">ZooKeeper</a> <a href="/ChrisJaunes/tags/container/" style="font-size: 10px;">container</a> <a href="/ChrisJaunes/tags/django/" style="font-size: 10px;">django</a> <a href="/ChrisJaunes/tags/metakernel/" style="font-size: 10px;">metakernel</a> <a href="/ChrisJaunes/tags/python/" style="font-size: 10px;">python</a> <a href="/ChrisJaunes/tags/test/" style="font-size: 10px;">test</a> <a href="/ChrisJaunes/tags/web/" style="font-size: 10px;">web</a> <a href="/ChrisJaunes/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 14px;">分布式</a> <a href="/ChrisJaunes/tags/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/" style="font-size: 10px;">单元测试</a> <a href="/ChrisJaunes/tags/%E5%BA%8F%E5%88%97%E5%8C%96/" style="font-size: 10px;">序列化</a> <a href="/ChrisJaunes/tags/%E6%9D%82%E8%B0%88/" style="font-size: 10px;">杂谈</a>
+        </div>
+        
+
+        
+            <div class="widget-categories widget" style="order: 3 ">
+                <h2 class="widget-title"><i class="fa fa-folder-open"></i> Categories</h2>
+                 <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Blockly/">Blockly</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Blockly/BlocklyJupyter/">BlocklyJupyter</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/C/">C++</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/C/%E6%A0%87%E5%87%86%E5%BA%93/">标准库</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/D3/">D3</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/">Java</a><span class="category-list-count">6</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Http/">Http</a><span class="category-list-count">4</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Http/HttpServer/">HttpServer</a><span class="category-list-count">4</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Java/Servlet/">Servlet</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Presto/">Presto</a><span class="category-list-count">2</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Presto/SqlParser/">SqlParser</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/">Python</a><span class="category-list-count">5</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Docx/">Docx</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Json/">Json</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/Mock/">Mock</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Python/%E5%86%85%E7%BD%AE%E5%87%BD%E6%95%B0/">内置函数</a><span class="category-list-count">2</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/Skulpt/">Skulpt</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TaskFlow/">TaskFlow</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TensorFlow/">TensorFlow</a><span class="category-list-count">1</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/TensorFlow/env/">env</a><span class="category-list-count">1</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/django/">django</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/programing-language/">programing_language</a><span class="category-list-count">6</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/programing-language/%E6%AF%94%E8%BE%83%E5%AD%A6%E4%B9%A0/">比较学习</a><span class="category-list-count">6</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a><span class="category-list-count">3</span><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%88%86%E5%B8%83%E5%BC%8F/ZooKeeper/">ZooKeeper</a><span class="category-list-count">3</span></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">单元测试</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/ChrisJaunes/categories/%E6%9D%82%E8%B0%88/">杂谈</a><span class="category-list-count">1</span></li></ul> 
+            </div>         
+        
+    </div>
+</section>
+</div>
+
+
+<footer class="footer">
+	<p class="footer-intro">
+		
+		@2023 ChrisJaunes.
+	</p>
+	<p class="footer-intro">
+			Powered By <a href="https://github.com/ChrisJaunes" target="_blank"> ChrisJaunes </a> |
+			Hexo Powered By <a href="https://hexo.io/zh-cn/" target="_blank">hexo</a> |
+			Theme Powered by ChrisJaunes 
+	</p>
+	<p class="footer-intro">
+		<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+		<span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次 &nbsp;|&nbsp;</span>
+		<span id="busuanzi_container_site_uv">访客数<span id="busuanzi_value_site_uv"></span>人次&nbsp;|&nbsp;</span>
+		<span id="busuanzi_container_page_pv">本文总阅读量<span id="busuanzi_value_page_pv"></span>次</span>
+	</p>
+</footer>
+
+
+
+
+<div class="extend-tools" id="extend-tools" style="display: none;">
+    <ul>
+        <li class="tools-returnTop" title="Back to top"><i class="fa fa-angle-double-up"></i></li>
+    </ul>
+</div>
+
+	</div>
+
+
+<script src="/ChrisJaunes/js/org/jquery.min.js"></script>
+
+
+<script src="/ChrisJaunes/js/extend.js"></script>
+
+</body>
+</html>
